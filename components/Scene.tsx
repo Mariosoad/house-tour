@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useMemo, useState } from "react";
+import { useRef, useMemo } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { Html } from "@react-three/drei";
+import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 
 export type SceneProps = {
@@ -41,13 +41,28 @@ function sunColorAndIntensity(timeOfDay: number): { color: THREE.Color; intensit
 }
 
 export function Scene({ timeOfDay = 0.35, sunRotation = 0 }: SceneProps) {
-  const { gl } = useThree();
   const sunRef = useRef<THREE.DirectionalLight>(null);
   const lightTarget = useMemo(() => new THREE.Object3D(), []);
   lightTarget.position.set(0, 0, 0);
 
-  const [label, setLabel] = useState<string | null>(null);
-  const labelTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { scene } = useGLTF("/Casona.gltf");
+  const clone = useMemo(() => {
+    const c = scene.clone();
+    c.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        (child as THREE.Mesh).castShadow = true;
+        (child as THREE.Mesh).receiveShadow = true;
+      }
+    });
+    const box = new THREE.Box3().setFromObject(c);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = 20 / maxDim;
+    c.scale.setScalar(scale);
+    c.position.sub(center.multiplyScalar(scale));
+    return c;
+  }, [scene]);
 
   const pos = sunPosition(timeOfDay, sunRotation);
   const { color, intensity } = sunColorAndIntensity(timeOfDay);
@@ -62,19 +77,6 @@ export function Scene({ timeOfDay = 0.35, sunRotation = 0 }: SceneProps) {
       sunRef.current.shadow.updateMatrices(sunRef.current);
     }
   });
-
-  const setCursor = (c: string) => {
-    gl.domElement.style.cursor = c;
-  };
-
-  const showLabel = (name: string) => {
-    if (labelTimeout.current) clearTimeout(labelTimeout.current);
-    setLabel(name);
-    labelTimeout.current = setTimeout(() => {
-      setLabel(null);
-      labelTimeout.current = null;
-    }, 2500);
-  };
 
   return (
     <>
@@ -96,68 +98,7 @@ export function Scene({ timeOfDay = 0.35, sunRotation = 0 }: SceneProps) {
         shadow-bias={-0.0002}
         shadow-normalBias={0.02}
       />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-        <planeGeometry args={[40, 40]} />
-        <meshStandardMaterial color="#3d3d3d" roughness={0.9} metalness={0.05} />
-      </mesh>
-
-      <mesh
-        position={[0, 1.5, 0]}
-        castShadow
-        receiveShadow
-        onClick={() => showLabel("Main box")}
-        onPointerOver={(e) => (e.stopPropagation(), setCursor("pointer"))}
-        onPointerOut={() => setCursor("default")}
-      >
-        <boxGeometry args={[2, 2, 2]} />
-        <meshStandardMaterial color="#c0a080" roughness={0.6} metalness={0.1} />
-        {label === "Main box" && (
-          <Html center distanceFactor={6}>
-            <div className="scene-label">Main box</div>
-          </Html>
-        )}
-      </mesh>
-
-      <mesh
-        position={[3, 0.6, 2]}
-        castShadow
-        receiveShadow
-        onClick={() => showLabel("Blue box")}
-        onPointerOver={(e) => (e.stopPropagation(), setCursor("pointer"))}
-        onPointerOut={() => setCursor("default")}
-      >
-        <boxGeometry args={[1.2, 1.2, 1.2]} />
-        <meshStandardMaterial color="#6080a0" roughness={0.5} metalness={0.15} />
-        {label === "Blue box" && (
-          <Html center distanceFactor={6}>
-            <div className="scene-label">Blue box</div>
-          </Html>
-        )}
-      </mesh>
-
-      <mesh
-        position={[-2.5, 0.4, 1.5]}
-        castShadow
-        receiveShadow
-        onClick={() => showLabel("Sphere")}
-        onPointerOver={(e) => (e.stopPropagation(), setCursor("pointer"))}
-        onPointerOut={() => setCursor("default")}
-      >
-        <sphereGeometry args={[0.8, 32, 32]} />
-        <meshStandardMaterial
-          color="#e8a050"
-          emissive="#e8a050"
-          emissiveIntensity={0.4}
-          roughness={0.6}
-          metalness={0}
-        />
-        {label === "Sphere" && (
-          <Html center distanceFactor={6}>
-            <div className="scene-label">Sphere</div>
-          </Html>
-        )}
-      </mesh>
-
+      <primitive object={clone} />
       <color attach="background" args={["#1a1a22"]} />
     </>
   );

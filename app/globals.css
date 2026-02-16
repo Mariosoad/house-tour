@@ -60,6 +60,45 @@ body {
   z-index: 10;
 }
 
+.metrics-overlay .metrics-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  min-width: 120px;
+}
+.metrics-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.metrics-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+}
+.metrics-fps {
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.metrics-toggle {
+  margin-top: 0.25rem;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.metrics-toggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
 .overlay-scroll-hint {
   position: absolute;
   left: 50%;
@@ -122,4 +161,58 @@ body {
   font-size: 0.8rem;
   white-space: nowrap;
   pointer-events: none;
+}
+
+/* Lighting panel sliders: pista visible + thumb centrado */
+.lighting-slider-wrap {
+  position: relative;
+  height: 24px;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+.lighting-slider-wrap .lighting-track {
+  pointer-events: none;
+  z-index: 0;
+}
+.lighting-slider-wrap .lighting-range {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+  background: transparent;
+  z-index: 1;
+}
+.lighting-range {
+  -webkit-appearance: none;
+  appearance: none;
+}
+.lighting-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+.lighting-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+.lighting-range::-webkit-slider-runnable-track,
+.lighting-range::-moz-range-track {
+  background: transparent;
+  border: none;
 }

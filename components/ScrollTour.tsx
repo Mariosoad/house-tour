@@ -5,11 +5,17 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { damp } from "@/lib/math";
 import { useTourScroll } from "@/lib/tourScrollContext";
+import { useMetrics } from "@/lib/metricsContext";
 
 const DAMPING = 3;
 const JUMP_EASE_SPEED = 1.2;
 
-/** Camera path positions (CatmullRomCurve3). */
+/**
+ * Curva de POSICIONES de la cámara (dónde está la cámara en cada momento).
+ * CatmullRomCurve3 con closed=true hace un loop: el último punto se une al primero.
+ * getPointAt(t) con t en [0, 1] da un punto a lo largo de la curva (0 = inicio, 1 = fin = inicio).
+ * Puedes poner tantos puntos como quieras; la curva interpola suavemente entre ellos.
+ */
 function getPositionCurve(): THREE.CatmullRomCurve3 {
   const points = [
     new THREE.Vector3(8, 3.5, 8),
@@ -24,7 +30,11 @@ function getPositionCurve(): THREE.CatmullRomCurve3 {
   return new THREE.CatmullRomCurve3(points, true);
 }
 
-/** Camera lookAt targets along the path. */
+/**
+ * Curva de MIRADAS (hacia dónde mira la cámara en cada t).
+ * Debe tener el mismo "ritmo" que la curva de posiciones: el punto [i] corresponde
+ * más o menos al tramo entre position[i] y position[i+1]. Así la cámara mira bien en cada tramo.
+ */
 function getTargetCurve(): THREE.CatmullRomCurve3 {
   const points = [
     new THREE.Vector3(0, 1.5, 0),
@@ -42,6 +52,7 @@ function getTargetCurve(): THREE.CatmullRomCurve3 {
 export function ScrollTour() {
   const { camera } = useThree();
   const { progressRef, targetProgressRef, setProgress } = useTourScroll();
+  const { freeCamera } = useMetrics();
 
   const positionCurve = useMemo(() => getPositionCurve(), []);
   const targetCurve = useMemo(() => getTargetCurve(), []);
@@ -63,6 +74,7 @@ export function ScrollTour() {
   }
 
   useFrame((_, delta) => {
+    if (freeCamera) return;
     const targetT = targetProgressRef.current;
     let t: number;
 

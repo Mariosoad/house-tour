@@ -1,0 +1,35 @@
+"use client";
+
+import { createContext, useContext, useState, useCallback } from "react";
+
+export type MetricsContextValue = {
+  fps: number;
+  setFps: (fps: number) => void;
+  freeCamera: boolean;
+  setFreeCamera: (v: boolean) => void;
+};
+
+const MetricsContext = createContext<MetricsContextValue | null>(null);
+
+export function MetricsProvider({ children }: { children: React.ReactNode }) {
+  const [fps, setFps] = useState(0);
+  const [freeCamera, setFreeCamera] = useState(false);
+  const setFreeCameraStable = useCallback((v: boolean) => setFreeCamera(v), []);
+  const value: MetricsContextValue = {
+    fps,
+    setFps,
+    freeCamera,
+    setFreeCamera: setFreeCameraStable,
+  };
+  return (
+    <MetricsContext.Provider value={value}>
+      {children}
+    </MetricsContext.Provider>
+  );
+}
+
+export function useMetrics(): MetricsContextValue {
+  const ctx = useContext(MetricsContext);
+  if (!ctx) throw new Error("useMetrics must be used within MetricsProvider");
+  return ctx;
+}

@@ -17,12 +17,15 @@ const PRESETS: { label: string; time: number; rotation: number }[] = [
   { label: "Dusk", time: 0.85, rotation: -30 },
 ];
 
-function timeToClock(t: number): string {
+function timeToDisplay(t: number): { hourMin: string; ampm: string } {
   const hour = Math.floor(5 + t * 14) % 24;
   const minute = Math.floor(((5 + t * 14) % 1) * 60);
   const ampm = hour >= 12 ? "PM" : "AM";
   const h = hour % 12 || 12;
-  return `${h}:${minute.toString().padStart(2, "0")} ${ampm}`;
+  return {
+    hourMin: `${h}:${minute.toString().padStart(2, "0")}`,
+    ampm,
+  };
 }
 
 export function LightingControls({
@@ -32,191 +35,374 @@ export function LightingControls({
   onSunRotationChange,
 }: LightingControlsProps) {
   const [preset, setPreset] = useState<string>("Brunch");
-  const [collapsed, setCollapsed] = useState(false);
-  const clockRef = useRef<HTMLSpanElement>(null);
+  const [open, setOpen] = useState(true);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const hourMinRef = useRef<HTMLSpanElement>(null);
+  const ampmRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const close = () => setDropdownOpen(false);
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, [dropdownOpen]);
 
   useEffect(() => {
     let raf = 0;
     const tick = () => {
-      if (clockRef.current) clockRef.current.textContent = timeToClock(timeOfDay);
+      const { hourMin, ampm } = timeToDisplay(timeOfDay);
+      if (hourMinRef.current) hourMinRef.current.textContent = hourMin;
+      if (ampmRef.current) ampmRef.current.textContent = ampm;
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [timeOfDay]);
 
+  const handlePresetSelect = (p: (typeof PRESETS)[0]) => {
+    setPreset(p.label);
+    onTimeOfDayChange(p.time);
+    onSunRotationChange(p.rotation);
+    setDropdownOpen(false);
+  };
+
   const panelStyle: React.CSSProperties = {
     position: "fixed",
     bottom: 24,
-    right: 24,
+    left: "50%",
+    transform: "translateX(-50%)",
     zIndex: 100,
     display: "flex",
-    flexDirection: "column",
-    gap: 14,
-    padding: "18px 20px",
-    borderRadius: 16,
-    background: "rgba(18, 18, 22, 0.82)",
-    backdropFilter: "blur(16px)",
-    WebkitBackdropFilter: "blur(16px)",
-    border: "1px solid rgba(255,255,255,0.06)",
-    boxShadow: "0 12px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.03)",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 20,
+    padding: "16px 20px 14px",
+    borderRadius: 24,
+    background: "rgba(32, 32, 36, 0.95)",
+    border: "1px solid rgba(255,255,255,0.08)",
+    boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
     fontFamily: "system-ui, -apple-system, sans-serif",
     fontSize: 13,
     color: "#e4e4e7",
-    minWidth: 320,
-    maxWidth: 380,
+    minWidth: 720,
+    maxWidth: 720,
   };
 
-  const sliderTrackGradient =
-    "linear-gradient(to right, #1e3a5f 0%, #2d5a87 20%, #6b9bb8 40%, #c9a227 60%, #e07850 80%, #8b3a3a 100%)";
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label="Abrir controles de iluminación"
+        style={{
+          position: "fixed",
+          bottom: 24,
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 100,
+          padding: "10px 18px",
+          borderRadius: 20,
+          background: "rgba(32, 32, 36, 0.95)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          color: "rgba(255,255,255,0.8)",
+          fontSize: 13,
+          cursor: "pointer",
+          fontFamily: "inherit",
+        }}
+      >
+        Time of day
+      </button>
+    );
+  }
+
+  // Posiciones de las etiquetas en % para alinear con el slider (0 = 5 AM, 1 = 9 PM)
+  const timeLabels = [
+    { label: "5 AM", t: 0 },
+    { label: "9 AM", t: (9 - 5) / 14 },
+    { label: "1 PM", t: (13 - 5) / 14 },
+    { label: "5 PM", t: (17 - 5) / 14 },
+    { label: "9 PM", t: 1 },
+  ];
+  const rotationLabels = [
+    { label: "0°", v: 0 },
+    { label: "90°", v: 90 },
+    { label: "180°", v: 180 },
+    { label: "270°", v: 270 },
+    { label: "360°", v: 360 },
+  ];
 
   return (
     <div className="lighting-controls" style={panelStyle}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <span
-          ref={clockRef}
-          style={{
-            fontSize: 28,
-            fontWeight: 700,
-            letterSpacing: "-0.02em",
-            color: "#fff",
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
-          {timeToClock(timeOfDay)}
-        </span>
-        <button
-          type="button"
-          onClick={() => setCollapsed(!collapsed)}
-          aria-label={collapsed ? "Abrir panel" : "Cerrar panel"}
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: "50%",
-            border: "1px solid rgba(255,255,255,0.12)",
-            background: "rgba(255,255,255,0.06)",
-            color: "#a0a0b0",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 16,
-          }}
-        >
-          {collapsed ? "☰" : "✕"}
-        </button>
+      {/* Hora + preset como un solo bloque */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          gap: 10,
+          flexShrink: 0,
+          paddingRight: 4,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "baseline" }}>
+          <span
+            ref={hourMinRef}
+            style={{
+              fontSize: 32,
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              color: "#fff",
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {timeToDisplay(timeOfDay).hourMin}
+          </span>
+          <span
+            ref={ampmRef}
+            style={{
+              marginLeft: 4,
+              alignSelf: "flex-end",
+              paddingBottom: 4,
+              fontSize: 14,
+              fontWeight: 500,
+              color: "rgba(255,255,255,0.9)",
+            }}
+          >
+            {timeToDisplay(timeOfDay).ampm}
+          </span>
+        </div>
+
+        {/* Preset dropdown "Brunch" pegado a la hora */}
+        <div style={{ position: "relative" }} onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            onClick={() => setDropdownOpen((o) => !o)}
+            aria-haspopup="listbox"
+            aria-expanded={dropdownOpen}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "8px 14px",
+              borderRadius: 12,
+              border: "1px solid rgba(255,255,255,0.1)",
+              background: "rgba(0,0,0,0.25)",
+              color: "#fff",
+              fontSize: 14,
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
+          >
+            {preset}
+            <span style={{ fontSize: 10, opacity: 0.9 }}>▲</span>
+          </button>
+        {dropdownOpen && (
+          <ul
+            role="listbox"
+            style={{
+              position: "absolute",
+              bottom: "100%",
+              left: 0,
+              marginBottom: 4,
+              padding: "6px 0",
+              borderRadius: 10,
+              background: "rgba(28,28,32,0.98)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              listStyle: "none",
+              minWidth: 120,
+              zIndex: 200,
+            }}
+          >
+            {PRESETS.map((p) => (
+              <li key={p.label}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={preset === p.label}
+                  onClick={() => handlePresetSelect(p)}
+                  style={{
+                    width: "100%",
+                    padding: "8px 14px",
+                    textAlign: "left",
+                    background: "none",
+                    border: "none",
+                    color: preset === p.label ? "#fff" : "rgba(255,255,255,0.85)",
+                    fontSize: 13,
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                  }}
+                >
+                  {p.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        </div>
       </div>
 
-      {!collapsed && (
-        <>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <label
-              htmlFor="preset-select"
-              style={{ color: "#a0a0b0", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.06em" }}
-            >
-              Preset
-            </label>
-            <select
-              id="preset-select"
-              value={preset}
-              onChange={(e) => {
-                const p = PRESETS.find((x) => x.label === e.target.value);
-                if (p) {
-                  setPreset(p.label);
-                  onTimeOfDayChange(p.time);
-                  onSunRotationChange(p.rotation);
-                }
-              }}
-              style={{
-                flex: 1,
-                padding: "8px 12px",
-                borderRadius: 8,
-                border: "1px solid rgba(255,255,255,0.1)",
-                background: "rgba(0,0,0,0.25)",
-                color: "#fff",
-                fontSize: 13,
-                cursor: "pointer",
-              }}
-            >
-              {PRESETS.map((p) => (
-                <option key={p.label} value={p.label}>
-                  {p.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-              <span style={{ color: "#a0a0b0", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                Time of day
-              </span>
-              <span style={{ fontSize: 11, color: "#808090" }}>5 AM — 9 PM</span>
-            </div>
+      {/* TIME OF DAY slider with gradient track */}
+      <div style={{ flex: 1, minWidth: 140 }}>
+        <div
+          style={{
+            color: "rgba(255,255,255,0.7)",
+            fontSize: 10,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            marginBottom: 6,
+          }}
+        >
+          TIME OF DAY
+        </div>
+        <div className="lighting-slider-wrap">
+          <div
+            aria-hidden
+            className="lighting-track"
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              pointerEvents: "none",
+              zIndex: 0,
+            }}
+          >
             <div
               style={{
-                height: 8,
-                borderRadius: 4,
-                background: sliderTrackGradient,
-                marginBottom: 4,
-                position: "relative",
-              }}
-            />
-            <input
-              type="range"
-              min={0}
-              max={1}
-              step={0.005}
-              value={timeOfDay}
-              onChange={(e) => onTimeOfDayChange(Number(e.target.value))}
-              style={{
+                height: 10,
                 width: "100%",
-                height: 20,
-                marginTop: -28,
-                marginBottom: 0,
-                accentColor: "#c9a227",
-                cursor: "pointer",
-                background: "transparent",
+                borderRadius: 5,
+                background:
+                  "linear-gradient(to right, #1e3a5f 0%, #2d5a87 18%, #6b9bb8 35%, #a8c040 50%, #c9a227 65%, #e07850 82%, #8b3a3a 100%)",
               }}
             />
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 2, fontSize: 10, color: "#606070" }}>
-              <span>5 AM</span>
-              <span>1 PM</span>
-              <span>5 PM</span>
-              <span>9 PM</span>
-            </div>
           </div>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.005}
+            value={timeOfDay}
+            onChange={(e) => onTimeOfDayChange(Number(e.target.value))}
+            className="lighting-range lighting-range-time"
+          />
+        </div>
+        <div
+          style={{
+            position: "relative",
+            marginTop: 2,
+            height: 14,
+          }}
+        >
+          {timeLabels.map(({ label, t }) => (
+            <span
+              key={label}
+              style={{
+                position: "absolute",
+                left: `${t * 100}%`,
+                transform: "translateX(-50%)",
+                fontSize: 10,
+                color: "rgba(255,255,255,0.5)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {label}
+            </span>
+          ))}
+        </div>
+      </div>
 
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-              <span style={{ color: "#a0a0b0", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                Sun rotation
-              </span>
-              <span style={{ fontSize: 12, fontVariantNumeric: "tabular-nums" }}>{Math.round(sunRotation)}°</span>
-            </div>
-            <input
-              type="range"
-              min={0}
-              max={360}
-              step={1}
-              value={sunRotation}
-              onChange={(e) => onSunRotationChange(Number(e.target.value))}
+      {/* SUN ROTATION slider */}
+      <div style={{ flex: 1, minWidth: 120 }}>
+        <div
+          style={{
+            color: "rgba(255,255,255,0.7)",
+            fontSize: 10,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            marginBottom: 6,
+          }}
+        >
+          SUN ROTATION
+        </div>
+        <div className="lighting-slider-wrap">
+          <div
+            aria-hidden
+            className="lighting-track"
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              pointerEvents: "none",
+              zIndex: 0,
+            }}
+          >
+            <div
               style={{
+                height: 10,
                 width: "100%",
-                accentColor: "#c9a227",
-                cursor: "pointer",
+                borderRadius: 5,
+                background: "rgba(255,255,255,0.15)",
               }}
             />
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 2, fontSize: 10, color: "#606070" }}>
-              <span>0°</span>
-              <span>90°</span>
-              <span>180°</span>
-              <span>270°</span>
-              <span>360°</span>
-            </div>
           </div>
-        </>
-      )}
+          <input
+            type="range"
+            min={0}
+            max={360}
+            step={1}
+            value={sunRotation}
+            onChange={(e) => onSunRotationChange(Number(e.target.value))}
+            className="lighting-range lighting-range-rotation"
+          />
+        </div>
+        <div
+          style={{
+            position: "relative",
+            marginTop: 2,
+            height: 14,
+          }}
+        >
+          {rotationLabels.map(({ label, v }) => (
+            <span
+              key={label}
+              style={{
+                position: "absolute",
+                left: `${(v / 360) * 100}%`,
+                transform: "translateX(-50%)",
+                fontSize: 10,
+                color: "rgba(255,255,255,0.5)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {label}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Close button */}
+      <button
+        type="button"
+        onClick={() => setOpen(false)}
+        aria-label="Cerrar panel"
+        style={{
+          width: 28,
+          height: 28,
+          borderRadius: "50%",
+          border: "none",
+          background: "rgba(255,255,255,0.08)",
+          color: "rgba(255,255,255,0.7)",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 14,
+          flexShrink: 0,
+        }}
+      >
+        ✕
+      </button>
     </div>
   );
 }

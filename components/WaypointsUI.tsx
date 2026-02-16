@@ -1,6 +1,7 @@
 "use client";
 
 import { useTourScroll } from "@/lib/tourScrollContext";
+import { useMetrics } from "@/lib/metricsContext";
 import { WAYPOINTS } from "@/lib/waypoints";
 
 function closestWaypointT(progress: number): number {
@@ -19,7 +20,13 @@ function closestWaypointT(progress: number): number {
 
 export function WaypointsUI() {
   const { progress, setTargetProgress } = useTourScroll();
+  const { freeCamera, setFreeCamera } = useMetrics();
   const currentT = closestWaypointT(progress);
+
+  const goToWaypoint = (t: number) => {
+    setTargetProgress(t);
+    if (freeCamera) setFreeCamera(false);
+  };
 
   return (
     <div className="waypoints-ui">
@@ -29,9 +36,9 @@ export function WaypointsUI() {
             key={wp.id}
             type="button"
             className={`waypoint-dot ${currentT === wp.t ? "active" : ""}`}
-            onClick={() => setTargetProgress(wp.t)}
+            onClick={() => goToWaypoint(wp.t)}
             title={wp.label}
-            aria-label={`Go to ${wp.label}`}
+            aria-label={`Ir a ${wp.label}`}
           >
             <span className="waypoint-dot-inner" />
           </button>
