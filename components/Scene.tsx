@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useMemo } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useRef, useMemo, useEffect } from "react";
+import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { getSceneObjectsList } from "@/lib/sceneObjects";
 
 export type SceneProps = {
   timeOfDay?: number;
@@ -46,12 +47,46 @@ export function Scene({ timeOfDay = 0.35, sunRotation = 0 }: SceneProps) {
   lightTarget.position.set(0, 0, 0);
 
   const { scene } = useGLTF("/Casona.gltf");
+  const objectsList = useMemo(() => getSceneObjectsList(scene), [scene]);
+
+  useEffect(() => {
+    if (objectsList.length === 0) return;
+    if (typeof window === "undefined") return;
+    console.log("[Casona.gltf] Objetos en la escena (para materiales/shaders):", objectsList);
+    window.dispatchEvent(
+      new CustomEvent("scene-objects-loaded", { detail: { objects: objectsList } })
+    );
+  }, [objectsList]);
+
+  const glassMaterial = useMemo(() => {
+    return new THREE.MeshPhysicalMaterial({
+      color: 0xffffff,
+      metalness: 0,
+      roughness: 0.05,
+      transmission: 1,
+      thickness: 0.15,
+      ior: 1.5,
+      transparent: true,
+      side: THREE.DoubleSide,
+      envMapIntensity: 1,
+      attenuationColor: new THREE.Color(0.95, 0.98, 1),
+      attenuationDistance: 0.5,
+    });
+  }, []);
+
   const clone = useMemo(() => {
     const c = scene.clone();
     c.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
-        (child as THREE.Mesh).castShadow = true;
-        (child as THREE.Mesh).receiveShadow = true;
+        const mesh = child as THREE.Mesh;
+        if (mesh.name.startsWith("SM_Window_")) {
+          mesh.material = glassMaterial;
+          mesh.castShadow = false;
+          mesh.receiveShadow = true;
+        } else {
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+        }
       }
     });
     const box = new THREE.Box3().setFromObject(c);
@@ -62,7 +97,7 @@ export function Scene({ timeOfDay = 0.35, sunRotation = 0 }: SceneProps) {
     c.scale.setScalar(scale);
     c.position.sub(center.multiplyScalar(scale));
     return c;
-  }, [scene]);
+  }, [scene, glassMaterial]);
 
   const pos = sunPosition(timeOfDay, sunRotation);
   const { color, intensity } = sunColorAndIntensity(timeOfDay);

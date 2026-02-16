@@ -11,6 +11,7 @@ import { FPSReporter } from "@/components/FPSReporter";
 import { WaypointsUI } from "@/components/WaypointsUI";
 import { LightingControls } from "@/components/LightingControls";
 import { MetricsOverlay } from "@/components/MetricsOverlay";
+import { SceneObjectsPanel } from "@/components/SceneObjectsPanel";
 
 function FallbackContent() {
   return (
@@ -66,6 +67,7 @@ function TourExperienceInner() {
         </Canvas>
 
         <MetricsOverlay />
+        <SceneObjectsPanel />
 
         <div className="overlay-scroll-hint">
           <span className="overlay-glass">Scroll to explore</span>

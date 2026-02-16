@@ -152,6 +152,107 @@ body {
   display: none;
 }
 
+/* Scene objects list (Casona.gltf) */
+.scene-objects-panel {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.scene-objects-panel-toggle {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: none;
+  color: inherit;
+  text-align: left;
+  border-radius: 8px;
+}
+.scene-objects-panel-toggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+.scene-objects-panel-content {
+  padding: 0.6rem 0.75rem;
+  max-width: 320px;
+  max-height: 60vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-radius: 8px;
+}
+.scene-objects-panel-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.scene-objects-filter {
+  padding: 0.4rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+  color: inherit;
+}
+.scene-objects-filter::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+.scene-objects-check {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+.scene-objects-list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.scene-objects-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.scene-objects-item:last-child {
+  border-bottom: none;
+}
+.scene-objects-name {
+  font-weight: 500;
+  word-break: break-all;
+}
+.scene-objects-material {
+  font-size: 0.7rem;
+  opacity: 0.75;
+}
+.scene-objects-copy {
+  margin-left: auto;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.65rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+  cursor: pointer;
+}
+.scene-objects-copy:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.scene-objects-empty {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin: 0;
+}
+
 /* 3D scene label (Html overlay) */
 .scene-label {
   background: rgba(0, 0, 0, 0.75);
