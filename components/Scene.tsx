@@ -1,13 +1,13 @@
 "use client";
 
-import { useRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { useRef, useMemo, useState } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
+import { Html } from "@react-three/drei";
 import * as THREE from "three";
 
 export type SceneProps = {
-  timeOfDay: number; // 0 = 5 AM, 1 = 9 PM
-  sunRotation: number; // 0..360 degrees
+  timeOfDay?: number;
+  sunRotation?: number;
 };
 
 function sunPosition(timeOfDay: number, sunRotationDeg: number): THREE.Vector3 {
@@ -31,15 +31,23 @@ function sunColorAndIntensity(timeOfDay: number): { color: THREE.Color; intensit
   const kelvin = 5500 + warmth * 3500;
   const intensity = 1.2 + (1 - distFromMidday) * 1.8;
   const r = kelvin <= 6600 ? 1 : Math.min(1, 1.292 - (kelvin - 6600) / 3400);
-  const g = kelvin <= 6600 ? Math.min(1, 0.39 * Math.log(kelvin / 100 - 2) - 0.26) : Math.min(1, 0.543 + (kelvin - 6600) / 3400 * 0.18);
-  const b = kelvin <= 2000 ? 0 : kelvin <= 6600 ? 0.543 + (kelvin - 2000) / 4600 * 0.2 : 1;
+  const g =
+    kelvin <= 6600
+      ? Math.min(1, 0.39 * Math.log(kelvin / 100 - 2) - 0.26)
+      : Math.min(1, 0.543 + ((kelvin - 6600) / 3400) * 0.18);
+  const b =
+    kelvin <= 2000 ? 0 : kelvin <= 6600 ? 0.543 + ((kelvin - 2000) / 4600) * 0.2 : 1;
   return { color: new THREE.Color(r, g, b), intensity: Math.min(3, intensity * 1.5) };
 }
 
-export function Scene({ timeOfDay, sunRotation }: SceneProps) {
+export function Scene({ timeOfDay = 0.35, sunRotation = 0 }: SceneProps) {
+  const { gl } = useThree();
   const sunRef = useRef<THREE.DirectionalLight>(null);
   const lightTarget = useMemo(() => new THREE.Object3D(), []);
   lightTarget.position.set(0, 0, 0);
+
+  const [label, setLabel] = useState<string | null>(null);
+  const labelTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const pos = sunPosition(timeOfDay, sunRotation);
   const { color, intensity } = sunColorAndIntensity(timeOfDay);
@@ -55,16 +63,21 @@ export function Scene({ timeOfDay, sunRotation }: SceneProps) {
     }
   });
 
+  const setCursor = (c: string) => {
+    gl.domElement.style.cursor = c;
+  };
+
+  const showLabel = (name: string) => {
+    if (labelTimeout.current) clearTimeout(labelTimeout.current);
+    setLabel(name);
+    labelTimeout.current = setTimeout(() => {
+      setLabel(null);
+      labelTimeout.current = null;
+    }, 2500);
+  };
+
   return (
     <>
-      <OrbitControls
-        makeDefault
-        target={[0, 2, 0]}
-        minDistance={4}
-        maxDistance={40}
-        maxPolarAngle={Math.PI / 2 - 0.1}
-        enablePan
-      />
       <ambientLight intensity={0.08} />
       <primitive object={lightTarget} />
       <directionalLight
@@ -87,18 +100,64 @@ export function Scene({ timeOfDay, sunRotation }: SceneProps) {
         <planeGeometry args={[40, 40]} />
         <meshStandardMaterial color="#3d3d3d" roughness={0.9} metalness={0.05} />
       </mesh>
-      <mesh position={[0, 1.5, 0]} castShadow receiveShadow>
+
+      <mesh
+        position={[0, 1.5, 0]}
+        castShadow
+        receiveShadow
+        onClick={() => showLabel("Main box")}
+        onPointerOver={(e) => (e.stopPropagation(), setCursor("pointer"))}
+        onPointerOut={() => setCursor("default")}
+      >
         <boxGeometry args={[2, 2, 2]} />
         <meshStandardMaterial color="#c0a080" roughness={0.6} metalness={0.1} />
+        {label === "Main box" && (
+          <Html center distanceFactor={6}>
+            <div className="scene-label">Main box</div>
+          </Html>
+        )}
       </mesh>
-      <mesh position={[3, 0.6, 2]} castShadow receiveShadow>
+
+      <mesh
+        position={[3, 0.6, 2]}
+        castShadow
+        receiveShadow
+        onClick={() => showLabel("Blue box")}
+        onPointerOver={(e) => (e.stopPropagation(), setCursor("pointer"))}
+        onPointerOut={() => setCursor("default")}
+      >
         <boxGeometry args={[1.2, 1.2, 1.2]} />
         <meshStandardMaterial color="#6080a0" roughness={0.5} metalness={0.15} />
+        {label === "Blue box" && (
+          <Html center distanceFactor={6}>
+            <div className="scene-label">Blue box</div>
+          </Html>
+        )}
       </mesh>
-      <mesh position={[-2.5, 0.4, 1.5]} castShadow receiveShadow>
+
+      <mesh
+        position={[-2.5, 0.4, 1.5]}
+        castShadow
+        receiveShadow
+        onClick={() => showLabel("Sphere")}
+        onPointerOver={(e) => (e.stopPropagation(), setCursor("pointer"))}
+        onPointerOut={() => setCursor("default")}
+      >
         <sphereGeometry args={[0.8, 32, 32]} />
-        <meshStandardMaterial color="#e8a050" emissive="#e8a050" emissiveIntensity={0.4} roughness={0.6} metalness={0} />
+        <meshStandardMaterial
+          color="#e8a050"
+          emissive="#e8a050"
+          emissiveIntensity={0.4}
+          roughness={0.6}
+          metalness={0}
+        />
+        {label === "Sphere" && (
+          <Html center distanceFactor={6}>
+            <div className="scene-label">Sphere</div>
+          </Html>
+        )}
       </mesh>
+
       <color attach="background" args={["#1a1a22"]} />
     </>
   );
