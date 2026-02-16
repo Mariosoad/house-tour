@@ -36,6 +36,7 @@ function WebGPUExperience({
         frameloop="never"
         dpr={[1, 1.5]}
         camera={{ position: [6, 4, 10], fov: 42, near: 0.1, far: 100 }}
+        shadows
         style={{ width: "100%", height: "100%", display: "block" }}
       >
         <Suspense fallback={<FallbackContent />}>
@@ -70,9 +71,7 @@ function WebGLExperience({
         dpr={[1, 1.5]}
         camera={{ position: [6, 4, 10], fov: 42, near: 0.1, far: 100 }}
         gl={{ antialias: true, toneMapping: 4, toneMappingExposure: 1, outputColorSpace: "srgb" }}
-        onCreated={({ gl }) => {
-          gl.shadowMap.enabled = true;
-        }}
+        shadows
         style={{ width: "100%", height: "100%", display: "block" }}
       >
         <Suspense fallback={<FallbackContent />}>

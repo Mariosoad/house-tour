@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
@@ -38,6 +38,9 @@ function sunColorAndIntensity(timeOfDay: number): { color: THREE.Color; intensit
 
 export function Scene({ timeOfDay, sunRotation }: SceneProps) {
   const sunRef = useRef<THREE.DirectionalLight>(null);
+  const lightTarget = useMemo(() => new THREE.Object3D(), []);
+  lightTarget.position.set(0, 0, 0);
+
   const pos = sunPosition(timeOfDay, sunRotation);
   const { color, intensity } = sunColorAndIntensity(timeOfDay);
 
@@ -48,6 +51,7 @@ export function Scene({ timeOfDay, sunRotation }: SceneProps) {
       sunRef.current.intensity = intensity;
       sunRef.current.target.position.set(0, 0, 0);
       sunRef.current.target.updateMatrixWorld();
+      sunRef.current.shadow.updateMatrices(sunRef.current);
     }
   });
 
@@ -62,18 +66,22 @@ export function Scene({ timeOfDay, sunRotation }: SceneProps) {
         enablePan
       />
       <ambientLight intensity={0.08} />
+      <primitive object={lightTarget} />
       <directionalLight
         ref={sunRef}
         position={[pos.x, pos.y, pos.z]}
+        target={lightTarget}
         intensity={intensity}
         castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-far={80}
-        shadow-camera-left={-15}
-        shadow-camera-right={15}
-        shadow-camera-top={15}
-        shadow-camera-bottom={-15}
-        shadow-bias={-0.0001}
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-far={120}
+        shadow-camera-left={-28}
+        shadow-camera-right={28}
+        shadow-camera-top={28}
+        shadow-camera-bottom={-28}
+        shadow-camera-near={0.5}
+        shadow-bias={-0.0002}
+        shadow-normalBias={0.02}
       />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
         <planeGeometry args={[40, 40]} />
