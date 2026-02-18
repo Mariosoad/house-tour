@@ -11,40 +11,36 @@ const DAMPING = 3;
 const JUMP_EASE_SPEED = 1.2;
 
 /**
- * Curva de POSICIONES de la cámara (dónde está la cámara en cada momento).
- * CatmullRomCurve3 con closed=true hace un loop: el último punto se une al primero.
- * getPointAt(t) con t en [0, 1] da un punto a lo largo de la curva (0 = inicio, 1 = fin = inicio).
- * Puedes poner tantos puntos como quieras; la curva interpola suavemente entre ellos.
+ * Curva de POSICIONES de la cámara.
+ * Recorrido: frente exterior (vista completa) → acercándose → interior → baño → exterior baño → loop.
  */
 function getPositionCurve(): THREE.CatmullRomCurve3 {
   const points = [
-    new THREE.Vector3(8, 3.5, 8),
-    new THREE.Vector3(5, 2.8, 5),
-    new THREE.Vector3(4, 2.2, 2),
-    new THREE.Vector3(1, 3, 3),
-    new THREE.Vector3(-4, 2.8, 3),
-    new THREE.Vector3(-3, 3.5, 6),
-    new THREE.Vector3(2, 4, 9),
-    new THREE.Vector3(8, 3.5, 8),
+    new THREE.Vector3(0, 1, 10),     // 0: FRENTE - cámara atrás, vista completa del modelo
+    new THREE.Vector3(4, 3.5, 6),    // 1: diagonal acercándose
+    new THREE.Vector3(2.2, 1.3, 1.6),// 2: interior dormitorio (celosías)
+    new THREE.Vector3(0.5, 1.1, 2),  // 3: dormitorio pie de cama
+    new THREE.Vector3(0, 1.4, -1.6), // 4: baño vanity
+    new THREE.Vector3(1.2, 1.2, -2.2),// 5: baño bañera
+    new THREE.Vector3(-4, 2.2, -2),  // 6: exterior ventana baño
+    new THREE.Vector3(0, 4, 10),     // 7: loop al inicio
   ];
   return new THREE.CatmullRomCurve3(points, true);
 }
 
 /**
  * Curva de MIRADAS (hacia dónde mira la cámara en cada t).
- * Debe tener el mismo "ritmo" que la curva de posiciones: el punto [i] corresponde
- * más o menos al tramo entre position[i] y position[i+1]. Así la cámara mira bien en cada tramo.
  */
 function getTargetCurve(): THREE.CatmullRomCurve3 {
   const points = [
-    new THREE.Vector3(0, 1.5, 0),
-    new THREE.Vector3(0, 1.5, 0),
-    new THREE.Vector3(3, 0.6, 2),
-    new THREE.Vector3(1.5, 1, 1.5),
-    new THREE.Vector3(-2.5, 0.4, 1.5),
-    new THREE.Vector3(-1, 1, 2),
-    new THREE.Vector3(0, 1, 2),
-    new THREE.Vector3(0, 1.5, 0),
+    new THREE.Vector3(0, 1, 0),    // 0: centro casa (vista frontal)
+    new THREE.Vector3(0, 1.5, 0),    // 1
+    new THREE.Vector3(0.5, 0.9, 1.8),// 2: cama
+    new THREE.Vector3(0, 0.9, 0.8),  // 3: cabecera
+    new THREE.Vector3(0, 1, -1.8),   // 4: vanity
+    new THREE.Vector3(0, 1, -2),     // 5: bañera
+    new THREE.Vector3(-2, 1, -2),    // 6: ventana baño
+    new THREE.Vector3(0, 1.8, 0),    // 7
   ];
   return new THREE.CatmullRomCurve3(points, true);
 }

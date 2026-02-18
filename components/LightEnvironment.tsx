@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import * as THREE from "three";
 import { Environment } from "@react-three/drei";
 
@@ -28,7 +29,7 @@ function sunColorAndIntensity(timeOfDay: number): { color: THREE.Color; intensit
       : Math.min(1, 0.543 + ((kelvin - 6600) / 3400) * 0.18);
   const b =
     kelvin <= 2000 ? 0 : kelvin <= 6600 ? 0.543 + ((kelvin - 2000) / 4600) * 0.2 : 1;
-  return { color: new THREE.Color(r, g, b), intensity: Math.min(2.5, intensity * 1.2) };
+  return { color: new THREE.Color(r, g, b), intensity: Math.min(2.5, intensity * 1.4) };
 }
 
 export type LightEnvironmentProps = {
@@ -37,12 +38,18 @@ export type LightEnvironmentProps = {
 };
 
 export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0 }: LightEnvironmentProps) {
+  const lightTarget = useMemo(() => {
+    const t = new THREE.Object3D();
+    t.position.set(0, 0, 0);
+    return t;
+  }, []);
   const pos = sunPosition(timeOfDay, sunRotation);
   const { color, intensity } = sunColorAndIntensity(timeOfDay);
   const envIntensity = 0.06 + 0.12 * (0.5 - Math.abs((timeOfDay * 14 + 5 - 12) / 14));
   return (
     <>
       <ambientLight intensity={0.1} />
+      <primitive object={lightTarget} />
       <directionalLight
         position={[pos.x, pos.y, pos.z]}
         intensity={intensity}

@@ -2,13 +2,16 @@
 
 import { useLayoutEffect, useRef } from "react";
 import * as THREE from "three";
+import { ContactShadows } from "@react-three/drei";
+import { EffectComposer, SSAO } from "@react-three/postprocessing";
+import { useMetrics } from "@/lib/metricsContext";
 import { Light_Environment } from "./LightEnvironment";
 import { House } from "./House";
 
 export type SceneProps = {
   timeOfDay?: number;
   sunRotation?: number;
-  /** When true, avoid MeshDepthMaterial/ShaderMaterial (ContactShadows and light shadows disabled for WebGPU). */
+  /** When true, avoid MeshDepthMaterial/ShaderMaterial (ContactShadows disabled for WebGPU). */
   webgpu?: boolean;
   contactShadows?: {
     enabled?: boolean;
@@ -23,10 +26,11 @@ export type SceneProps = {
 export function Scene({
   timeOfDay = 0.4,
   sunRotation = 0,
-  webgpu: _webgpu = false,
-  contactShadows: _contactShadows,
+  webgpu = false,
+  contactShadows: contactShadowsConfig,
 }: SceneProps) {
   const houseGroupRef = useRef<THREE.Group>(null);
+  const { ssaoEnabled } = useMetrics();
 
   useLayoutEffect(() => {
     const g = houseGroupRef.current;
@@ -53,12 +57,29 @@ export function Scene({
     g.position.y += -box3.min.y;
   }, []);
 
+  const contactEnabled = contactShadowsConfig?.enabled !== false;
+
   return (
     <>
       <Light_Environment timeOfDay={timeOfDay} sunRotation={sunRotation} />
       <group ref={houseGroupRef}>
         <House />
       </group>
+      {!webgpu && contactEnabled && (
+        <ContactShadows
+          position={[0, -0.01, 0]}
+          scale={15}
+          far={15}
+          opacity={contactShadowsConfig?.opacity ?? 0.65}
+          blur={contactShadowsConfig?.blur ?? 3}
+          resolution={contactShadowsConfig?.resolution ?? 1024}
+        />
+      )}
+      {ssaoEnabled && (
+        <EffectComposer enableNormalPass resolutionScale={0.5}>
+          <SSAO radius={20} intensity={1} bias={0.5} />
+        </EffectComposer>
+      )}
     </>
   );
 }
