@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useLayoutEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { damp } from "@/lib/math";
@@ -56,22 +56,21 @@ export function ScrollTour() {
   const currentTarget = useRef(new THREE.Vector3());
   const initialized = useRef(false);
 
+  // Inicialización síncrona: misma cámara en dev y prod (evita diferencias por Strict Mode / frame order)
+  useLayoutEffect(() => {
+    const t = 0;
+    positionCurve.getPointAt(t, currentPosition.current);
+    targetCurve.getPointAt(t, currentTarget.current);
+    camera.position.copy(currentPosition.current);
+    camera.lookAt(currentTarget.current);
+    currentT.current = t;
+    progressRef.current = t;
+    setProgress(t);
+    initialized.current = true;
+  }, [camera, positionCurve, targetCurve, progressRef, setProgress]);
+
   useFrame((_, delta) => {
     if (freeCamera) return;
-
-    // Inicialización determinista: siempre t=0, mismo resultado en dev y prod
-    if (!initialized.current) {
-      const t = 0;
-      positionCurve.getPointAt(t, currentPosition.current);
-      targetCurve.getPointAt(t, currentTarget.current);
-      camera.position.copy(currentPosition.current);
-      camera.lookAt(currentTarget.current);
-      currentT.current = t;
-      progressRef.current = t;
-      setProgress(t);
-      initialized.current = true;
-      return;
-    }
 
     const targetT = targetProgressRef.current;
     let t: number;
