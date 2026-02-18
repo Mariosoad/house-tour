@@ -34,7 +34,7 @@ export function LightingControls({
   onTimeOfDayChange,
   onSunRotationChange,
 }: LightingControlsProps) {
-  const [preset, setPreset] = useState<string>("Brunch");
+  const [preset, setPreset] = useState<string>("Dusk");
   const [open, setOpen] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const hourMinRef = useRef<HTMLSpanElement>(null);

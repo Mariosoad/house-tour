@@ -7,11 +7,14 @@ import { TourScrollProvider, useTourScroll } from "@/lib/tourScrollContext";
 import { MetricsProvider, useMetrics } from "@/lib/metricsContext";
 import { Scene } from "@/components/Scene";
 import { ScrollTour } from "@/components/ScrollTour";
+import { CameraDebugUpdater } from "@/components/CameraDebugUpdater";
 import { CameraController } from "@/components/CameraController";
 import { FPSReporter } from "@/components/FPSReporter";
 import { WaypointsUI } from "@/components/WaypointsUI";
 import { LightingControls } from "@/components/LightingControls";
 import { MetricsOverlay } from "@/components/MetricsOverlay";
+import { TourDebugOverlay } from "@/components/TourDebugOverlay";
+import { TourDebugProvider } from "@/lib/tourDebugContext";
 
 function FallbackContent() {
   return (
@@ -34,8 +37,8 @@ function TourExperienceInner() {
   const { addDelta } = useTourScroll();
   const { freeCamera } = useMetrics();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [timeOfDay, setTimeOfDay] = useState(0.4);
-  const [sunRotation, setSunRotation] = useState(0);
+  const [timeOfDay, setTimeOfDay] = useState(0.849);  // 4:53 PM
+  const [sunRotation, setSunRotation] = useState(30);
   const onTimeOfDayChange = useCallback((v: number) => setTimeOfDay(v), []);
   const onSunRotationChange = useCallback((v: number) => setSunRotation(v), []);
 
@@ -61,7 +64,7 @@ function TourExperienceInner() {
       >
         <Canvas
           dpr={[1, 1.5]}
-          camera={{ position: [0, 8, 10], fov: 42, near: 0.1, far: 100 }}
+          camera={{ position: [-0.02, 1.07, 5.28], fov: 42, near: 0.1, far: 100 }}
           gl={{
             antialias: true,
             toneMapping: THREE.ACESFilmicToneMapping,
@@ -80,12 +83,14 @@ function TourExperienceInner() {
               contactShadows={sceneContactShadows}
             />
             <ScrollTour />
+            <CameraDebugUpdater />
             <CameraController />
             <FPSReporter />
           </Suspense>
         </Canvas>
 
         <MetricsOverlay />
+        <TourDebugOverlay />
         <div className="overlay-scroll-hint">
           <span className="overlay-glass">Scroll to explore</span>
         </div>
@@ -105,11 +110,13 @@ function TourExperienceInner() {
 export function Experience() {
   return (
     <TourScrollProvider>
-      <MetricsProvider>
+      <TourDebugProvider>
+        <MetricsProvider>
         <div style={{ width: "100%", height: "100vh", position: "relative" }}>
           <TourExperienceInner />
         </div>
       </MetricsProvider>
+      </TourDebugProvider>
     </TourScrollProvider>
   );
 }

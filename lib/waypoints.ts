@@ -18,11 +18,9 @@ export type Waypoint = {
 };
 
 export const WAYPOINTS: Waypoint[] = [
-  { id: "exterior-frente", label: "Frente exterior", t: 0 },
-  { id: "exterior-2", label: "Vista lateral", t: 1 / 7 },
-  { id: "dormitorio-slat", label: "Dormitorio (celosías)", t: 2 / 7 },
-  { id: "dormitorio-pie", label: "Dormitorio desde el pie", t: 3 / 7 },
-  { id: "bano-vanity", label: "Baño doble lavabo", t: 4 / 7 },
-  { id: "bano-bathtub", label: "Baño bañera", t: 5 / 7 },
-  { id: "exterior-bano", label: "Exterior ventana baño", t: 0.8 },
+  { id: "wp1", label: "1", t: 0 },
+  { id: "wp2", label: "2", t: 1 / 7 },
+  { id: "wp3", label: "3", t: 2 / 7 },
+  { id: "wp4", label: "4", t: 3 / 7 },
+  { id: "wp5", label: "5", t: 4 / 7 },
 ];

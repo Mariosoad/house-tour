@@ -11,36 +11,34 @@ const DAMPING = 3;
 const JUMP_EASE_SPEED = 1.2;
 
 /**
- * Curva de POSICIONES de la cámara.
- * Recorrido: frente exterior (vista completa) → acercándose → interior → baño → exterior baño → loop.
+ * Curva de POSICIONES - con punto de transición 5→1 para loop suave.
+ * Cámaras ligeramente más adentro para mejor vista del interior.
  */
 function getPositionCurve(): THREE.CatmullRomCurve3 {
   const points = [
-    new THREE.Vector3(0, 1, 10),     // 0: FRENTE - cámara atrás, vista completa del modelo
-    new THREE.Vector3(4, 3.5, 6),    // 1: diagonal acercándose
-    new THREE.Vector3(2.2, 1.3, 1.6),// 2: interior dormitorio (celosías)
-    new THREE.Vector3(0.5, 1.1, 2),  // 3: dormitorio pie de cama
-    new THREE.Vector3(0, 1.4, -1.6), // 4: baño vanity
-    new THREE.Vector3(1.2, 1.2, -2.2),// 5: baño bañera
-    new THREE.Vector3(-4, 2.2, -2),  // 6: exterior ventana baño
-    new THREE.Vector3(0, 4, 10),     // 7: loop al inicio
+    new THREE.Vector3(-0.02, 1.07, 5.28),  // 1
+    new THREE.Vector3(2.9, 2.2, 2.2),      // 2: más adentro
+    new THREE.Vector3(2.2, 2.1, -2.4),     // 3: más adentro
+    new THREE.Vector3(-1.6, 1.85, -1.6),   // 4: más adentro
+    new THREE.Vector3(-2.4, 1.55, 1.35),   // 5: más adentro
+    new THREE.Vector3(-1.2, 1.35, 3.4),    // transición suave 5→1
+    new THREE.Vector3(-0.02, 1.07, 5.28),  // vuelta al 1
   ];
   return new THREE.CatmullRomCurve3(points, true);
 }
 
 /**
- * Curva de MIRADAS (hacia dónde mira la cámara en cada t).
+ * Curva de MIRADAS - targets ajustados para enfocar objetos mejor.
  */
 function getTargetCurve(): THREE.CatmullRomCurve3 {
   const points = [
-    new THREE.Vector3(0, 1, 0),    // 0: centro casa (vista frontal)
-    new THREE.Vector3(0, 1.5, 0),    // 1
-    new THREE.Vector3(0.5, 0.9, 1.8),// 2: cama
-    new THREE.Vector3(0, 0.9, 0.8),  // 3: cabecera
-    new THREE.Vector3(0, 1, -1.8),   // 4: vanity
-    new THREE.Vector3(0, 1, -2),     // 5: bañera
-    new THREE.Vector3(-2, 1, -2),    // 6: ventana baño
-    new THREE.Vector3(0, 1.8, 0),    // 7
+    new THREE.Vector3(-1.2, 0.7, 0.5),     // 1
+    new THREE.Vector3(-0.3, 0.8, 0.3),     // 2
+    new THREE.Vector3(0.2, 0.85, 1),       // 3
+    new THREE.Vector3(2, 0.9, -3),         // 4
+    new THREE.Vector3(1.6, 0.75, 0.6),     // 5
+    new THREE.Vector3(-0.8, 0.65, 0.6),    // transición
+    new THREE.Vector3(-1.2, 0.7, 0.5),     // vuelta
   ];
   return new THREE.CatmullRomCurve3(points, true);
 }
