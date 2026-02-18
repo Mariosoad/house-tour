@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -12,7 +13,7 @@ export function TourDebugOverlay() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const [info, setInfo] = useState<{ position: [number, number, number]; target: [number, number, number]; progress: number } | null>(null);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number>(0);
 
   useEffect(() => {
     if (!debug?.enabled) return;
