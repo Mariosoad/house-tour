@@ -1,156 +1,64 @@
 "use client";
 
-import { useRef, useMemo, useEffect } from "react";
-import { useFrame } from "@react-three/fiber";
-import { useGLTF } from "@react-three/drei";
+import { useLayoutEffect, useRef } from "react";
 import * as THREE from "three";
-import { getSceneObjectsList } from "@/lib/sceneObjects";
+import { Light_Environment } from "./LightEnvironment";
+import { House } from "./House";
 
 export type SceneProps = {
   timeOfDay?: number;
   sunRotation?: number;
+  /** When true, avoid MeshDepthMaterial/ShaderMaterial (ContactShadows and light shadows disabled for WebGPU). */
+  webgpu?: boolean;
+  contactShadows?: {
+    enabled?: boolean;
+    opacity?: number;
+    blur?: number;
+    far?: number;
+    resolution?: number;
+    scaleMultiplier?: number;
+  };
 };
 
-function sunPosition(timeOfDay: number, sunRotationDeg: number): THREE.Vector3 {
-  const hour = 5 + timeOfDay * 14; // 5 AM -> 9 PM
-  const angle = ((hour - 5) / 14) * Math.PI; // 0 at 5 AM, PI at 9 PM
-  const radius = 35;
-  const x = Math.cos(angle) * radius;
-  const y = Math.sin(angle) * radius * 0.6 + 8;
-  const z = Math.sin(angle * 0.5) * radius * 0.3;
-  const v = new THREE.Vector3(x, y, z);
-  v.applyAxisAngle(new THREE.Vector3(0, 1, 0), (sunRotationDeg * Math.PI) / 180);
-  return v;
-}
+export function Scene({
+  timeOfDay = 0.4,
+  sunRotation = 0,
+  webgpu: _webgpu = false,
+  contactShadows: _contactShadows,
+}: SceneProps) {
+  const houseGroupRef = useRef<THREE.Group>(null);
 
-function sunColorAndIntensity(timeOfDay: number): { color: THREE.Color; intensity: number } {
-  const hour = 5 + timeOfDay * 14;
-  const t = (hour - 5) / 14;
-  const midday = 0.5;
-  const distFromMidday = Math.abs(t - midday) * 2;
-  const warmth = 1 - distFromMidday;
-  const kelvin = 5500 + warmth * 3500;
-  const intensity = 1.2 + (1 - distFromMidday) * 1.8;
-  const r = kelvin <= 6600 ? 1 : Math.min(1, 1.292 - (kelvin - 6600) / 3400);
-  const g =
-    kelvin <= 6600
-      ? Math.min(1, 0.39 * Math.log(kelvin / 100 - 2) - 0.26)
-      : Math.min(1, 0.543 + ((kelvin - 6600) / 3400) * 0.18);
-  const b =
-    kelvin <= 2000 ? 0 : kelvin <= 6600 ? 0.543 + ((kelvin - 2000) / 4600) * 0.2 : 1;
-  return { color: new THREE.Color(r, g, b), intensity: Math.min(3, intensity * 1.5) };
-}
+  useLayoutEffect(() => {
+    const g = houseGroupRef.current;
+    if (!g) return;
 
-export function Scene({ timeOfDay = 0.35, sunRotation = 0 }: SceneProps) {
-  const sunRef = useRef<THREE.DirectionalLight>(null);
-  const lightTarget = useMemo(() => new THREE.Object3D(), []);
-  lightTarget.position.set(0, 0, 0);
-
-  // const { scene } = useGLTF("/Casona.gltf");
-  const { scene } = useGLTF("/DeluxeVilla.glb");
-  const objectsList = useMemo(() => getSceneObjectsList(scene), [scene]);
-
-  useEffect(() => {
-    if (objectsList.length === 0) return;
-    if (typeof window === "undefined") return;
-    console.log("[Casona.gltf] Objetos en la escena (para materiales/shaders):", objectsList);
-    window.dispatchEvent(
-      new CustomEvent("scene-objects-loaded", { detail: { objects: objectsList } })
-    );
-  }, [objectsList]);
-
-  const glassMaterial = useMemo(() => {
-    return new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
-      metalness: 0,
-      roughness: 0.05,
-      transmission: 1,
-      thickness: 0.15,
-      ior: 1.5,
-      transparent: true,
-      side: THREE.DoubleSide,
-      envMapIntensity: 1,
-      attenuationColor: new THREE.Color(0.95, 0.98, 1),
-      attenuationDistance: 0.5,
-    });
-  }, []);
-
-  const clone = useMemo(() => {
-    const c = scene.clone();
-    c.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh;
-        let hasGlass = false;
-        if (mesh.material) {
-          if (Array.isArray(mesh.material)) {
-            (mesh.material as THREE.Material[]).forEach((mat, i) => {
-              if (mat.name === "Vidrio") {
-                (mesh.material as THREE.Material[])[i] = glassMaterial;
-                hasGlass = true;
-              }
-            });
-          } else {
-            if ((mesh.material as THREE.Material).name === "Vidrio") {
-              mesh.material = glassMaterial;
-              hasGlass = true;
-            }
-          }
-        }
-        if (hasGlass) {
-          mesh.castShadow = false;
-          mesh.receiveShadow = true;
-        } else {
-          mesh.castShadow = true;
-          mesh.receiveShadow = true;
-        }
-      }
-    });
-    const box = new THREE.Box3().setFromObject(c);
-    const center = box.getCenter(new THREE.Vector3());
+    // Scale to a predictable size so the tour camera sees it.
+    const box = new THREE.Box3().setFromObject(g);
     const size = box.getSize(new THREE.Vector3());
     const maxDim = Math.max(size.x, size.y, size.z);
-    const scale = 20 / maxDim;
-    c.scale.setScalar(scale);
-    c.position.sub(center.multiplyScalar(scale));
-    return c;
-  }, [scene, glassMaterial]);
+    if (!Number.isFinite(maxDim) || maxDim <= 0) return;
 
-  const pos = sunPosition(timeOfDay, sunRotation);
-  const { color, intensity } = sunColorAndIntensity(timeOfDay);
+    const desiredMaxDim = 6; // world units
+    const s = desiredMaxDim / maxDim;
+    g.scale.setScalar(s);
+    g.updateWorldMatrix(true, true);
 
-  useFrame(() => {
-    if (sunRef.current) {
-      sunRef.current.position.copy(pos);
-      sunRef.current.color.copy(color);
-      sunRef.current.intensity = intensity;
-      sunRef.current.target.position.set(0, 0, 0);
-      sunRef.current.target.updateMatrixWorld();
-      sunRef.current.shadow.updateMatrices(sunRef.current);
-    }
-  });
+    // Recompute and center on X/Z, place on ground (minY -> 0).
+    const box2 = new THREE.Box3().setFromObject(g);
+    const center = box2.getCenter(new THREE.Vector3());
+    g.position.x += -center.x;
+    g.position.z += -center.z;
+    g.updateWorldMatrix(true, true);
+    const box3 = new THREE.Box3().setFromObject(g);
+    g.position.y += -box3.min.y;
+  }, []);
 
   return (
     <>
-      <ambientLight intensity={0.08} />
-      <primitive object={lightTarget} />
-      <directionalLight
-        ref={sunRef}
-        position={[pos.x, pos.y, pos.z]}
-        target={lightTarget}
-        intensity={intensity}
-        castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-camera-far={120}
-        shadow-camera-left={-28}
-        shadow-camera-right={28}
-        shadow-camera-top={28}
-        shadow-camera-bottom={-28}
-        shadow-camera-near={0.5}
-        shadow-bias={-0.0002}
-        shadow-normalBias={0.02}
-      />
-      <primitive object={clone} />
-      <color attach="background" args={["#1a1a22"]} />
+      <Light_Environment timeOfDay={timeOfDay} sunRotation={sunRotation} />
+      <group ref={houseGroupRef}>
+        <House />
+      </group>
     </>
   );
 }

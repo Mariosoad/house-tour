@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useRef, useState, useCallback } from "react";
-import { Canvas } from "@react-three/fiber";
+import { PerspectiveCamera } from "@react-three/drei";
 import { TourScrollProvider, useTourScroll } from "@/lib/tourScrollContext";
 import { MetricsProvider, useMetrics } from "@/lib/metricsContext";
 import { Scene } from "@/components/Scene";
@@ -11,7 +11,8 @@ import { FPSReporter } from "@/components/FPSReporter";
 import { WaypointsUI } from "@/components/WaypointsUI";
 import { LightingControls } from "@/components/LightingControls";
 import { MetricsOverlay } from "@/components/MetricsOverlay";
-import { SceneObjectsPanel } from "@/components/SceneObjectsPanel";
+import { ManciniCanvas } from "@/components/ManciniCanvas";
+import { WebGPUPostProcessing } from "@/components/WebGPUPostProcessing";
 
 function FallbackContent() {
   return (
@@ -22,12 +23,23 @@ function FallbackContent() {
   );
 }
 
+const cameraProps = { position: [8, 3.5, 8] as [number, number, number], fov: 42, near: 0.1, far: 100 };
+const sceneContactShadows = {
+  opacity: 0.65,
+  blur: 3,
+  resolution: 1024,
+  far: 5,
+  scaleMultiplier: 1.2,
+};
+
 function TourExperienceInner() {
   const { addDelta } = useTourScroll();
   const { freeCamera } = useMetrics();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [timeOfDay, setTimeOfDay] = useState(0.35);
+  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
+  const [timeOfDay, setTimeOfDay] = useState(0.4);
   const [sunRotation, setSunRotation] = useState(0);
+  const [postProcessingEnabled, setPostProcessingEnabled] = useState(true);
   const onTimeOfDayChange = useCallback((v: number) => setTimeOfDay(v), []);
   const onSunRotationChange = useCallback((v: number) => setSunRotation(v), []);
 
@@ -43,6 +55,20 @@ function TourExperienceInner() {
     return () => el.removeEventListener("wheel", onWheel);
   }, [addDelta, freeCamera]);
 
+  const sceneBlock = (
+    <>
+      <Scene
+        timeOfDay={timeOfDay}
+        sunRotation={sunRotation}
+        webgpu={true}
+        contactShadows={sceneContactShadows}
+      />
+      <ScrollTour />
+      <CameraController />
+      <FPSReporter />
+    </>
+  );
+
   return (
     <>
       <div
@@ -51,23 +77,53 @@ function TourExperienceInner() {
         role="application"
         aria-label="3D scroll tour"
       >
-        <Canvas
-          dpr={[1, 1.5]}
-          camera={{ position: [8, 3.5, 8], fov: 42, near: 0.1, far: 100 }}
-          gl={{ antialias: true, toneMapping: 4, toneMappingExposure: 1, outputColorSpace: "srgb" }}
-          shadows
+        <canvas
+          ref={(el) => {
+            if (el) setCanvas(el);
+          }}
           style={{ display: "block", width: "100%", height: "100%" }}
-        >
-          <Suspense fallback={<FallbackContent />}>
-            <Scene timeOfDay={timeOfDay} sunRotation={sunRotation} />
-            <ScrollTour />
-            <CameraController />
-            <FPSReporter />
-          </Suspense>
-        </Canvas>
+        />
+        {canvas && (
+          <ManciniCanvas camera={cameraProps} canvas={canvas} quality="high">
+            <color attach="background" args={["#111"]} />
+            <PerspectiveCamera
+              makeDefault
+              position={cameraProps.position}
+              fov={cameraProps.fov}
+              near={cameraProps.near}
+              far={cameraProps.far}
+            />
+            <Suspense fallback={<FallbackContent />}>{sceneBlock}</Suspense>
+            <WebGPUPostProcessing
+              enabled={postProcessingEnabled}
+              strength={1.2}
+              radius={0.4}
+            />
+          </ManciniCanvas>
+        )}
 
         <MetricsOverlay />
-        <SceneObjectsPanel />
+        <div
+          style={{
+            position: "absolute",
+            top: 16,
+            left: 16,
+            zIndex: 10,
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+            width: 260,
+          }}
+        >
+          <button
+            type="button"
+            className="overlay-glass"
+            onClick={() => setPostProcessingEnabled((v) => !v)}
+            style={{ cursor: "pointer", textAlign: "left" }}
+          >
+            Post-processing: <b>{postProcessingEnabled ? "ON" : "OFF"}</b>
+          </button>
+        </div>
 
         <div className="overlay-scroll-hint">
           <span className="overlay-glass">Scroll to explore</span>
