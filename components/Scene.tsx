@@ -46,7 +46,8 @@ export function Scene({ timeOfDay = 0.35, sunRotation = 0 }: SceneProps) {
   const lightTarget = useMemo(() => new THREE.Object3D(), []);
   lightTarget.position.set(0, 0, 0);
 
-  const { scene } = useGLTF("/Casona.gltf");
+  // const { scene } = useGLTF("/Casona.gltf");
+  const { scene } = useGLTF("/DeluxeVilla.glb");
   const objectsList = useMemo(() => getSceneObjectsList(scene), [scene]);
 
   useEffect(() => {
@@ -79,8 +80,23 @@ export function Scene({ timeOfDay = 0.35, sunRotation = 0 }: SceneProps) {
     c.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
-        if (mesh.name.startsWith("SM_Window_")) {
-          mesh.material = glassMaterial;
+        let hasGlass = false;
+        if (mesh.material) {
+          if (Array.isArray(mesh.material)) {
+            (mesh.material as THREE.Material[]).forEach((mat, i) => {
+              if (mat.name === "Vidrio") {
+                (mesh.material as THREE.Material[])[i] = glassMaterial;
+                hasGlass = true;
+              }
+            });
+          } else {
+            if ((mesh.material as THREE.Material).name === "Vidrio") {
+              mesh.material = glassMaterial;
+              hasGlass = true;
+            }
+          }
+        }
+        if (hasGlass) {
           mesh.castShadow = false;
           mesh.receiveShadow = true;
         } else {
