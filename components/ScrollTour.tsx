@@ -54,21 +54,25 @@ export function ScrollTour() {
   const currentT = useRef(0);
   const currentPosition = useRef(new THREE.Vector3());
   const currentTarget = useRef(new THREE.Vector3());
-
-  // Initialize to first frame sample
   const initialized = useRef(false);
-  if (!initialized.current) {
-    const t = progressRef.current;
-    positionCurve.getPointAt(t, currentPosition.current);
-    targetCurve.getPointAt(t, currentTarget.current);
-    camera.position.copy(currentPosition.current);
-    camera.lookAt(currentTarget.current);
-    currentT.current = t;
-    initialized.current = true;
-  }
 
   useFrame((_, delta) => {
     if (freeCamera) return;
+
+    // Inicialización determinista: siempre t=0, mismo resultado en dev y prod
+    if (!initialized.current) {
+      const t = 0;
+      positionCurve.getPointAt(t, currentPosition.current);
+      targetCurve.getPointAt(t, currentTarget.current);
+      camera.position.copy(currentPosition.current);
+      camera.lookAt(currentTarget.current);
+      currentT.current = t;
+      progressRef.current = t;
+      setProgress(t);
+      initialized.current = true;
+      return;
+    }
+
     const targetT = targetProgressRef.current;
     let t: number;
 
