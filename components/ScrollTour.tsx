@@ -11,36 +11,28 @@ import { INITIAL_CAMERA_POSITION, INITIAL_CAMERA_TARGET } from "@/lib/waypoints"
 const DAMPING = 3;
 const JUMP_EASE_SPEED = 1.2;
 
-/**
- * Curva de POSICIONES - waypoints definidos por el usuario + transición suave 5→1.
- */
+/** Curva cerrada de POSICIONES: 1 → 2 → 3 → 4 → 1 */
 function getPositionCurve(): THREE.CatmullRomCurve3 {
   const points = [
-    new THREE.Vector3(-0.02, 1.07, 5.28),  // 1
-    new THREE.Vector3(3.38, 2.54, 2.62),   // 2
-    new THREE.Vector3(2.62, 2.5, -2.89),   // 3
-    new THREE.Vector3(-1.99, 2.07, -1.97), // 4
-    new THREE.Vector3(-2.75, 1.69, 1.55),  // 5
-    new THREE.Vector3(-1.2, 1.4, 3.5),     // transición 5→1
-    new THREE.Vector3(-0.02, 1.07, 5.28),  // vuelta al 1
+    new THREE.Vector3(-0.0, 0.45, 1.66),   // 1
+    new THREE.Vector3(1.07, 0.67, 0.18),   // 2
+    new THREE.Vector3(0.93, 0.72, -0.91),  // 3
+    new THREE.Vector3(-0.76, 0.73, -1.09), // 4
+    new THREE.Vector3(-0.0, 0.45, 1.66),   // 1
   ];
-  return new THREE.CatmullRomCurve3(points, true);
+  return new THREE.CatmullRomCurve3(points, true); // true = loop cerrado
 }
 
-/**
- * Curva de MIRADAS - targets indicados por el usuario.
- */
+/** Curva cerrada de MIRADAS (targets): 1 → 2 → 3 → 4 → 1 */
 function getTargetCurve(): THREE.CatmullRomCurve3 {
   const points = [
-    new THREE.Vector3(-1.55, 0.61, 0.55),  // 1
-    new THREE.Vector3(-0.62, 0.71, 0.25),  // 2
-    new THREE.Vector3(0.35, 0.79, 1.22),   // 3
-    new THREE.Vector3(2.61, 0.96, -3.59),  // 4
-    new THREE.Vector3(2.1, 0.71, 0.84),    // 5
-    new THREE.Vector3(-1.2, 0.65, 0.55),   // transición
-    new THREE.Vector3(-1.55, 0.61, 0.55),  // vuelta
+    new THREE.Vector3(-1.62, -0.18, -3.03), // 1
+    new THREE.Vector3(-3.72, -0.55, 0.92),  // 2
+    new THREE.Vector3(-3.34, -0.3, 1.49),   // 3
+    new THREE.Vector3(3.44, -0.12, 1.5),    // 4
+    new THREE.Vector3(-1.62, -0.18, -3.03), // 1
   ];
-  return new THREE.CatmullRomCurve3(points, true);
+  return new THREE.CatmullRomCurve3(points, true); // true = loop cerrado
 }
 
 export function ScrollTour() {
