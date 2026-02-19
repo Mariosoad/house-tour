@@ -29,8 +29,8 @@ function sunColorAndIntensity(timeOfDay: number): { color: THREE.Color; intensit
       : Math.min(1, 0.543 + ((kelvin - 6600) / 3400) * 0.18);
   const b =
     kelvin <= 2000 ? 0 : kelvin <= 6600 ? 0.543 + ((kelvin - 2000) / 4600) * 0.2 : 1;
-  return { color: new THREE.Color(r, g, b), intensity: Math.min(2.5, intensity * 1.4) };
-}
+    return { color: new THREE.Color(r, g, b), intensity: Math.min(2.5, intensity * 1.4) };
+  }
 
 export type LightEnvironmentProps = {
   timeOfDay?: number;
@@ -49,7 +49,6 @@ export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0 }: LightEnv
 
   return (
     <>
-      <ambientLight intensity={0.02} />
       <primitive object={lightTarget} />
       <directionalLight
         position={[pos.x, pos.y, pos.z]}

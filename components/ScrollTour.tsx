@@ -11,28 +11,30 @@ import { INITIAL_CAMERA_POSITION, INITIAL_CAMERA_TARGET } from "@/lib/waypoints"
 const DAMPING = 3;
 const JUMP_EASE_SPEED = 1.2;
 
-/** Curva cerrada de POSICIONES: 1 → 2 → 3 → 4 → 1 */
+/** Curva de POSICIONES: 1 → 2 → 3 → 4 → 1 (primer punto duplicado para transición directa, sin glitch) */
 function getPositionCurve(): THREE.CatmullRomCurve3 {
+  const p1 = new THREE.Vector3(-0.0, 0.45, 1.66);
   const points = [
-    new THREE.Vector3(-0.0, 0.45, 1.66),   // 1
+    p1.clone(),                             // 1
     new THREE.Vector3(1.07, 0.67, 0.18),   // 2
     new THREE.Vector3(0.93, 0.72, -0.91),  // 3
     new THREE.Vector3(-0.76, 0.73, -1.09), // 4
-    new THREE.Vector3(-0.0, 0.45, 1.66),   // 1
+    p1,                                     // 1 de nuevo → tramo 4→1 directo
   ];
-  return new THREE.CatmullRomCurve3(points, true); // true = loop cerrado
+  return new THREE.CatmullRomCurve3(points, false);
 }
 
-/** Curva cerrada de MIRADAS (targets): 1 → 2 → 3 → 4 → 1 */
+/** Curva de MIRADAS (targets): 1 → 2 → 3 → 4 → 1 */
 function getTargetCurve(): THREE.CatmullRomCurve3 {
+  const t1 = new THREE.Vector3(-1.62, -0.18, -3.03);
   const points = [
-    new THREE.Vector3(-1.62, -0.18, -3.03), // 1
+    t1.clone(),                             // 1
     new THREE.Vector3(-3.72, -0.55, 0.92),  // 2
     new THREE.Vector3(-3.34, -0.3, 1.49),   // 3
     new THREE.Vector3(3.44, -0.12, 1.5),    // 4
-    new THREE.Vector3(-1.62, -0.18, -3.03), // 1
+    t1,                                     // 1 de nuevo
   ];
-  return new THREE.CatmullRomCurve3(points, true); // true = loop cerrado
+  return new THREE.CatmullRomCurve3(points, false);
 }
 
 export function ScrollTour() {
