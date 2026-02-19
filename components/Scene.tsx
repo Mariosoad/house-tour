@@ -112,7 +112,7 @@ export function Scene({
         // </EffectComposer>
         <EffectComposer enableNormalPass multisampling={0}>
           <N8AO
-            aoRadius={0.25}
+            aoRadius={0.20}
             intensity={5.0}
             distanceFalloff={0.5}
             quality="ultra"
