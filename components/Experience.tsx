@@ -4,7 +4,6 @@ import { Suspense, useEffect, useRef, useState, useCallback } from "react";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { TourScrollProvider, useTourScroll } from "@/lib/tourScrollContext";
-import { INITIAL_CAMERA_POSITION } from "@/lib/waypoints";
 import { MetricsProvider, useMetrics } from "@/lib/metricsContext";
 import { Scene } from "@/components/Scene";
 import { ScrollTour } from "@/components/ScrollTour";
@@ -16,6 +15,7 @@ import { LightingControls } from "@/components/LightingControls";
 import { MetricsOverlay } from "@/components/MetricsOverlay";
 import { TourDebugOverlay } from "@/components/TourDebugOverlay";
 import { TourDebugProvider } from "@/lib/tourDebugContext";
+import { IntroOverlay } from "@/components/IntroOverlay";
 
 function FallbackContent() {
   return (
@@ -94,7 +94,7 @@ function TourExperienceInner() {
         </Canvas>
 
         <MetricsOverlay />
-        <TourDebugOverlay />
+        {/* <TourDebugOverlay /> */}
         <div className="overlay-scroll-hint">
           <span className="overlay-glass">Scroll to explore</span>
         </div>
@@ -112,12 +112,22 @@ function TourExperienceInner() {
 }
 
 export function Experience() {
+  const [showIntro, setShowIntro] = useState(true);
+
+  const handleStartExperience = useCallback(() => {
+    setShowIntro(false);
+  }, []);
+
   return (
     <TourScrollProvider>
       <TourDebugProvider>
         <MetricsProvider>
         <div style={{ width: "100%", height: "100vh", position: "relative" }}>
           <TourExperienceInner />
+          <IntroOverlay
+            onStart={handleStartExperience}
+            className={showIntro ? "" : "is-hidden"}
+          />
         </div>
       </MetricsProvider>
       </TourDebugProvider>

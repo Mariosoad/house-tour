@@ -67,7 +67,7 @@ export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0 }: LightEnv
         shadow-normalBias={0.01}
       />
       <Environment
-        preset="warehouse"
+        files="/pretoria_gardens_2k.hdr"
         environmentIntensity={Math.max(0.08, envIntensity)}
         environmentRotation={[0.4, 0, 1.4]}
       />

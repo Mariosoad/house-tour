@@ -85,31 +85,6 @@ export function Scene({
         />
       )}
       {ssaoEnabled && (
-        // <EffectComposer enableNormalPass multisampling={0}>
-        //   {/* MICRO AO: contactos reales */}
-        //   <SSAO
-        //     samples={16}
-        //     rings={4}
-        //     radius={0.22}
-        //     intensity={1.25}
-        //     bias={0.02}
-        //     distanceThreshold={0.8}
-        //     distanceFalloff={0.35}
-        //     luminanceInfluence={0.3}
-        //   />
-
-        //   {/* MACRO AO: esquinas grandes, MUY sutil */}
-        //   <SSAO
-        //     samples={8}
-        //     rings={3}
-        //     radius={1.1}
-        //     intensity={0.18}
-        //     bias={0.08}
-        //     distanceThreshold={3.0}
-        //     distanceFalloff={1.0}
-        //     luminanceInfluence={0.2}
-        //   />
-        // </EffectComposer>
         <EffectComposer enableNormalPass multisampling={0}>
           <N8AO
             aoRadius={0.20}
