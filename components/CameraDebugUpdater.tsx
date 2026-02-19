@@ -11,11 +11,11 @@ import { useTourDebug } from "@/lib/tourDebugContext";
 function getPositionCurve(): THREE.CatmullRomCurve3 {
   const points = [
     new THREE.Vector3(-0.02, 1.07, 5.28),
-    new THREE.Vector3(2.9, 2.2, 2.2),
-    new THREE.Vector3(2.2, 2.1, -2.4),
-    new THREE.Vector3(-1.6, 1.85, -1.6),
-    new THREE.Vector3(-2.4, 1.55, 1.35),
-    new THREE.Vector3(-1.2, 1.35, 3.4),
+    new THREE.Vector3(3.38, 2.54, 2.62),
+    new THREE.Vector3(2.62, 2.5, -2.89),
+    new THREE.Vector3(-1.99, 2.07, -1.97),
+    new THREE.Vector3(-2.75, 1.69, 1.55),
+    new THREE.Vector3(-1.2, 1.4, 3.5),
     new THREE.Vector3(-0.02, 1.07, 5.28),
   ];
   return new THREE.CatmullRomCurve3(points, true);
@@ -23,13 +23,13 @@ function getPositionCurve(): THREE.CatmullRomCurve3 {
 
 function getTargetCurve(): THREE.CatmullRomCurve3 {
   const points = [
-    new THREE.Vector3(-1.2, 0.7, 0.5),
-    new THREE.Vector3(-0.3, 0.8, 0.3),
-    new THREE.Vector3(0.2, 0.85, 1),
-    new THREE.Vector3(2, 0.9, -3),
-    new THREE.Vector3(1.6, 0.75, 0.6),
-    new THREE.Vector3(-0.8, 0.65, 0.6),
-    new THREE.Vector3(-1.2, 0.7, 0.5),
+    new THREE.Vector3(-1.55, 0.61, 0.55),
+    new THREE.Vector3(-0.62, 0.71, 0.25),
+    new THREE.Vector3(0.35, 0.79, 1.22),
+    new THREE.Vector3(2.61, 0.96, -3.59),
+    new THREE.Vector3(2.1, 0.71, 0.84),
+    new THREE.Vector3(-1.2, 0.65, 0.55),
+    new THREE.Vector3(-1.55, 0.61, 0.55),
   ];
   return new THREE.CatmullRomCurve3(points, true);
 }

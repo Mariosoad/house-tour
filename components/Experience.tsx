@@ -4,6 +4,7 @@ import { Suspense, useEffect, useRef, useState, useCallback } from "react";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { TourScrollProvider, useTourScroll } from "@/lib/tourScrollContext";
+import { INITIAL_CAMERA_POSITION } from "@/lib/waypoints";
 import { MetricsProvider, useMetrics } from "@/lib/metricsContext";
 import { Scene } from "@/components/Scene";
 import { ScrollTour } from "@/components/ScrollTour";
@@ -64,7 +65,7 @@ function TourExperienceInner() {
       >
         <Canvas
           dpr={[1, 1.5]}
-          camera={{ position: [-0.02, 1.07, 5.28], fov: 42, near: 0.1, far: 100 }}
+          camera={{ position: [...INITIAL_CAMERA_POSITION], fov: 42, near: 0.1, far: 100 }}
           gl={{
             antialias: true,
             toneMapping: THREE.ACESFilmicToneMapping,

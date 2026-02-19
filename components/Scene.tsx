@@ -36,6 +36,15 @@ export function Scene({
     const g = houseGroupRef.current;
     if (!g) return;
 
+    // Asegurar que todas las geometrías tengan bounding box calculado (consistencia local/prod)
+    g.updateWorldMatrix(true, true);
+    g.traverse((obj) => {
+      const mesh = obj as THREE.Mesh;
+      if (mesh.isMesh && mesh.geometry) {
+        mesh.geometry.computeBoundingBox?.();
+      }
+    });
+
     // Scale to a predictable size so the tour camera sees it.
     const box = new THREE.Box3().setFromObject(g);
     const size = box.getSize(new THREE.Vector3());

@@ -6,39 +6,39 @@ import * as THREE from "three";
 import { damp } from "@/lib/math";
 import { useTourScroll } from "@/lib/tourScrollContext";
 import { useMetrics } from "@/lib/metricsContext";
+import { INITIAL_CAMERA_POSITION, INITIAL_CAMERA_TARGET } from "@/lib/waypoints";
 
 const DAMPING = 3;
 const JUMP_EASE_SPEED = 1.2;
 
 /**
- * Curva de POSICIONES - con punto de transición 5→1 para loop suave.
- * Cámaras ligeramente más adentro para mejor vista del interior.
+ * Curva de POSICIONES - waypoints definidos por el usuario + transición suave 5→1.
  */
 function getPositionCurve(): THREE.CatmullRomCurve3 {
   const points = [
     new THREE.Vector3(-0.02, 1.07, 5.28),  // 1
-    new THREE.Vector3(2.9, 2.2, 2.2),      // 2: más adentro
-    new THREE.Vector3(2.2, 2.1, -2.4),     // 3: más adentro
-    new THREE.Vector3(-1.6, 1.85, -1.6),   // 4: más adentro
-    new THREE.Vector3(-2.4, 1.55, 1.35),   // 5: más adentro
-    new THREE.Vector3(-1.2, 1.35, 3.4),    // transición suave 5→1
+    new THREE.Vector3(3.38, 2.54, 2.62),   // 2
+    new THREE.Vector3(2.62, 2.5, -2.89),   // 3
+    new THREE.Vector3(-1.99, 2.07, -1.97), // 4
+    new THREE.Vector3(-2.75, 1.69, 1.55),  // 5
+    new THREE.Vector3(-1.2, 1.4, 3.5),     // transición 5→1
     new THREE.Vector3(-0.02, 1.07, 5.28),  // vuelta al 1
   ];
   return new THREE.CatmullRomCurve3(points, true);
 }
 
 /**
- * Curva de MIRADAS - targets ajustados para enfocar objetos mejor.
+ * Curva de MIRADAS - targets indicados por el usuario.
  */
 function getTargetCurve(): THREE.CatmullRomCurve3 {
   const points = [
-    new THREE.Vector3(-1.2, 0.7, 0.5),     // 1
-    new THREE.Vector3(-0.3, 0.8, 0.3),     // 2
-    new THREE.Vector3(0.2, 0.85, 1),       // 3
-    new THREE.Vector3(2, 0.9, -3),         // 4
-    new THREE.Vector3(1.6, 0.75, 0.6),     // 5
-    new THREE.Vector3(-0.8, 0.65, 0.6),    // transición
-    new THREE.Vector3(-1.2, 0.7, 0.5),     // vuelta
+    new THREE.Vector3(-1.55, 0.61, 0.55),  // 1
+    new THREE.Vector3(-0.62, 0.71, 0.25),  // 2
+    new THREE.Vector3(0.35, 0.79, 1.22),   // 3
+    new THREE.Vector3(2.61, 0.96, -3.59),  // 4
+    new THREE.Vector3(2.1, 0.71, 0.84),    // 5
+    new THREE.Vector3(-1.2, 0.65, 0.55),   // transición
+    new THREE.Vector3(-1.55, 0.61, 0.55),  // vuelta
   ];
   return new THREE.CatmullRomCurve3(points, true);
 }
@@ -56,18 +56,18 @@ export function ScrollTour() {
   const currentTarget = useRef(new THREE.Vector3());
   const initialized = useRef(false);
 
-  // Inicialización síncrona: misma cámara en dev y prod (evita diferencias por Strict Mode / frame order)
+  // Inicialización: usar valores fijos para consistencia entre local y producción
   useLayoutEffect(() => {
     const t = 0;
-    positionCurve.getPointAt(t, currentPosition.current);
-    targetCurve.getPointAt(t, currentTarget.current);
-    camera.position.copy(currentPosition.current);
-    camera.lookAt(currentTarget.current);
+    currentPosition.current.set(...INITIAL_CAMERA_POSITION);
+    currentTarget.current.set(...INITIAL_CAMERA_TARGET);
+    camera.position.set(...INITIAL_CAMERA_POSITION);
+    camera.lookAt(...INITIAL_CAMERA_TARGET);
     currentT.current = t;
     progressRef.current = t;
     setProgress(t);
     initialized.current = true;
-  }, [camera, positionCurve, targetCurve, progressRef, setProgress]);
+  }, [camera, progressRef, setProgress]);
 
   useFrame((_, delta) => {
     if (freeCamera) return;

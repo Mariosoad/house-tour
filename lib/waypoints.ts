@@ -11,6 +11,11 @@
  * La iluminación es estática (controled manualmente); no varía con el recorrido.
  * La curva de cámara está en ScrollTour.tsx (getPositionCurve / getTargetCurve).
  */
+
+/** Posición y target inicial del waypoint 0. Usado por Canvas y ScrollTour para garantizar consistencia entre ambientes. */
+export const INITIAL_CAMERA_POSITION = [-0.02, 1.07, 5.28] as const;
+export const INITIAL_CAMERA_TARGET = [-1.55, 0.61, 0.55] as const;
+
 export type Waypoint = {
   id: string;
   label: string;
