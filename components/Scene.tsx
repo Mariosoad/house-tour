@@ -72,7 +72,7 @@ export function Scene({
     <>
       <Light_Environment timeOfDay={timeOfDay} sunRotation={sunRotation} />
       <group ref={houseGroupRef}>
-        <House />
+        <House parentGroupRef={houseGroupRef} />
       </group>
       {!webgpu && contactEnabled && (
         <ContactShadows

@@ -16,11 +16,19 @@ export function TourBottomBar({
   onTimeOfDayChange,
   onSunRotationChange,
 }: TourBottomBarProps) {
-  const { ssaoEnabled, setSsaoEnabled } = useMetrics();
+  const { ssaoEnabled, setSsaoEnabled, freeCamera, setFreeCamera } = useMetrics();
 
   return (
     <div className="tour-bottom-bar">
-      {/* <span className="tour-ui-glass">Scroll to explore</span> */}
+      <button
+        type="button"
+        className="tour-ui-btn"
+        onClick={() => setFreeCamera(!freeCamera)}
+        aria-pressed={freeCamera}
+        aria-label={freeCamera ? "Volver a recorrido guiado" : "Activar vista libre"}
+      >
+        {freeCamera ? "Recorrido guiado" : "Vista libre"}
+      </button>
       <LightingControls
         timeOfDay={timeOfDay}
         sunRotation={sunRotation}

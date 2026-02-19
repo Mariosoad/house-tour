@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Suspense, useEffect, useRef, useState, useCallback } from "react";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
+import { KeyboardControls } from "@react-three/drei";
 import { TourScrollProvider, useTourScroll } from "@/lib/tourScrollContext";
 import { MetricsProvider, useMetrics } from "@/lib/metricsContext";
 import { Scene } from "@/components/Scene";
@@ -12,10 +13,8 @@ import { CameraDebugUpdater } from "@/components/CameraDebugUpdater";
 import { CameraController } from "@/components/CameraController";
 import { FPSReporter } from "@/components/FPSReporter";
 import { WaypointsUI } from "@/components/WaypointsUI";
-import { LightingControls } from "@/components/LightingControls";
 import { MetricsOverlay } from "@/components/MetricsOverlay";
 import { TourBottomBar } from "@/components/TourBottomBar";
-import { TourDebugOverlay } from "@/components/TourDebugOverlay";
 import { TourDebugProvider } from "@/lib/tourDebugContext";
 import { IntroOverlay } from "@/components/IntroOverlay";
 
@@ -122,10 +121,18 @@ export function Experience() {
     setShowIntro(false);
   }, []);
 
+  const keyboardMap = [
+    { name: "forward", keys: ["KeyW", "ArrowUp"] },
+    { name: "backward", keys: ["KeyS", "ArrowDown"] },
+    { name: "left", keys: ["KeyA", "ArrowLeft"] },
+    { name: "right", keys: ["KeyD", "ArrowRight"] },
+  ];
+
   return (
     <TourScrollProvider>
       <TourDebugProvider>
         <MetricsProvider>
+        <KeyboardControls map={keyboardMap}>
         <div style={{ width: "100%", height: "100vh", position: "relative" }}>
           <TourExperienceInner hasStarted={!showIntro} />
           <IntroOverlay
@@ -133,6 +140,7 @@ export function Experience() {
             className={showIntro ? "" : "is-hidden"}
           />
         </div>
+        </KeyboardControls>
       </MetricsProvider>
       </TourDebugProvider>
     </TourScrollProvider>

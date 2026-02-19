@@ -1,15 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import type { RefObject } from "react";
+import { useEffect, useState } from "react";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import type * as THREEType from "three";
+import { MirrorReplica } from "./MirrorReplica";
 
 type GLTFResult = { scene: THREEType.Group };
 
 const MODEL_URL = "/DeluxeVilla.glb";
 
 const GLASS_NAMES = /vidrio|glass|cristal|window|ventana|cerramiento|crystal|pane/i;
+const MIRROR_NAMES = /espejo|mirror|reflector/i;
 
 function isGlassMaterial(mat: { name?: string; transmission?: number }): boolean {
   const name = mat?.name ?? "";
@@ -18,17 +21,28 @@ function isGlassMaterial(mat: { name?: string; transmission?: number }): boolean
   return false;
 }
 
-export function House() {
+function isMirrorMaterial(mat: { name?: string }): boolean {
+  const name = mat?.name ?? "";
+  return MIRROR_NAMES.test(name);
+}
+
+export function House({ parentGroupRef }: { parentGroupRef: RefObject<THREE.Group | null> }) {
   const { scene } = useGLTF(MODEL_URL) as unknown as GLTFResult;
+  const [mirrorMeshes, setMirrorMeshes] = useState<THREE.Mesh[]>([]);
+
   useEffect(() => {
+    const mirrors: THREE.Mesh[] = [];
     scene.traverse((obj) => {
       if ((obj as THREEType.Mesh).isMesh) {
         const mesh = obj as THREEType.Mesh;
         let hasGlass = false;
+        let hasMirror = false;
         if (Array.isArray(mesh.material)) {
           const materials = mesh.material;
           materials.forEach((mat, i) => {
-            if (isGlassMaterial(mat)) {
+            if (isMirrorMaterial(mat)) {
+              hasMirror = true;
+            } else if (isGlassMaterial(mat)) {
               hasGlass = true;
               materials[i] = new THREE.MeshPhysicalMaterial({
                 transmission: 1,
@@ -40,7 +54,9 @@ export function House() {
             }
           });
         } else if (mesh.material) {
-          if (isGlassMaterial(mesh.material)) {
+          if (isMirrorMaterial(mesh.material)) {
+            hasMirror = true;
+          } else if (isGlassMaterial(mesh.material)) {
             hasGlass = true;
             mesh.material = new THREE.MeshPhysicalMaterial({
               transmission: 1,
@@ -51,12 +67,30 @@ export function House() {
             });
           }
         }
-        mesh.castShadow = !hasGlass;
-        mesh.receiveShadow = true;
+        if (hasMirror) {
+          mesh.visible = false;
+          mirrors.push(mesh);
+        } else {
+          mesh.castShadow = !hasGlass;
+          mesh.receiveShadow = true;
+        }
       }
     });
+    setMirrorMeshes(mirrors);
   }, [scene]);
-  return <primitive object={scene} />;
+
+  return (
+    <>
+      <primitive object={scene} />
+      {mirrorMeshes.map((m) => (
+          <MirrorReplica
+            key={m.uuid}
+            sourceMesh={m}
+            parentGroupRef={parentGroupRef}
+          />
+        ))}
+    </>
+  );
 }
 
 useGLTF.preload(MODEL_URL);

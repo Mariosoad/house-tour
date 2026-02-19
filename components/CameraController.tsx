@@ -1,27 +1,46 @@
 "use client";
 
-import { OrbitControls } from "@react-three/drei";
+import { useRef } from "react";
+import * as THREE from "three";
+import { PointerLockControls, useKeyboardControls } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import { useThree } from "@react-three/fiber";
 import { useMetrics } from "@/lib/metricsContext";
 
-/** When freeCamera is true, enables OrbitControls so the user can orbit/pan/zoom freely. */
+const MOVE_SPEED = 0.01;
+
+/** Reads WASD from KeyboardControls and moves the camera. */
+function FirstPersonMover() {
+  const [, getKeys] = useKeyboardControls<"forward" | "backward" | "left" | "right">();
+  const { camera } = useThree();
+  const dir = useRef(new THREE.Vector3());
+  const right = useRef(new THREE.Vector3());
+
+  useFrame(() => {
+    const { forward, backward, left, right: rightKey } = getKeys();
+    if (!forward && !backward && !left && !rightKey) return;
+
+    camera.getWorldDirection(dir.current);
+    right.current.crossVectors(dir.current, new THREE.Vector3(0, 1, 0)).normalize();
+
+    if (forward) camera.position.addScaledVector(dir.current, MOVE_SPEED);
+    if (backward) camera.position.addScaledVector(dir.current, -MOVE_SPEED);
+    if (rightKey) camera.position.addScaledVector(right.current, MOVE_SPEED);
+    if (left) camera.position.addScaledVector(right.current, -MOVE_SPEED);
+  });
+
+  return null;
+}
+
+/** When freeCamera is true, enables PointerLockControls + WASD for first-person movement. */
 export function CameraController() {
   const { freeCamera } = useMetrics();
-  const camera = useThree((s) => s.camera);
   if (!freeCamera) return null;
+
   return (
-    <OrbitControls
-      camera={camera}
-      enableDamping
-      dampingFactor={0.05}
-      target={[0, 0, 0]}
-      makeDefault
-      enableRotate
-      enablePan
-      enableZoom
-      screenSpacePanning
-      minDistance={1}
-      maxDistance={50}
-    />
+    <>
+      <PointerLockControls makeDefault />
+      <FirstPersonMover />
+    </>
   );
 }
