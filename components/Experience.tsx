@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Suspense, useEffect, useRef, useState, useCallback } from "react";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
@@ -13,6 +14,7 @@ import { FPSReporter } from "@/components/FPSReporter";
 import { WaypointsUI } from "@/components/WaypointsUI";
 import { LightingControls } from "@/components/LightingControls";
 import { MetricsOverlay } from "@/components/MetricsOverlay";
+import { TourBottomBar } from "@/components/TourBottomBar";
 import { TourDebugOverlay } from "@/components/TourDebugOverlay";
 import { TourDebugProvider } from "@/lib/tourDebugContext";
 import { IntroOverlay } from "@/components/IntroOverlay";
@@ -20,7 +22,7 @@ import { IntroOverlay } from "@/components/IntroOverlay";
 function FallbackContent() {
   return (
     <mesh>
-      <boxGeometry args={[1, 1, 1]} />
+      {/* <boxGeometry args={[1, 1, 1]} /> */}
       <meshStandardMaterial color="#444" />
     </mesh>
   );
@@ -34,7 +36,7 @@ const sceneContactShadows = {
   scaleMultiplier: 1.2,
 };
 
-function TourExperienceInner() {
+function TourExperienceInner({ hasStarted }: { hasStarted: boolean }) {
   const { addDelta } = useTourScroll();
   const { freeCamera } = useMetrics();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -93,19 +95,21 @@ function TourExperienceInner() {
           </Suspense>
         </Canvas>
 
-        <MetricsOverlay />
-        {/* <TourDebugOverlay /> */}
-        <div className="overlay-scroll-hint">
-          <span className="overlay-glass">Scroll to explore</span>
-        </div>
-
-        <WaypointsUI />
-        <LightingControls
-          timeOfDay={timeOfDay}
-          sunRotation={sunRotation}
-          onTimeOfDayChange={onTimeOfDayChange}
-          onSunRotationChange={onSunRotationChange}
-        />
+        {hasStarted && (
+          <>
+            <div className="tour-ui__brand">
+              <Image src="/logo-gemdam.png" alt="Gemdam" width={140} height={36} className="tour-ui__brand-img" />
+            </div>
+            <MetricsOverlay />
+            <WaypointsUI />
+            <TourBottomBar
+              timeOfDay={timeOfDay}
+              sunRotation={sunRotation}
+              onTimeOfDayChange={onTimeOfDayChange}
+              onSunRotationChange={onSunRotationChange}
+            />
+          </>
+        )}
       </div>
     </>
   );
@@ -123,7 +127,7 @@ export function Experience() {
       <TourDebugProvider>
         <MetricsProvider>
         <div style={{ width: "100%", height: "100vh", position: "relative" }}>
-          <TourExperienceInner />
+          <TourExperienceInner hasStarted={!showIntro} />
           <IntroOverlay
             onStart={handleStartExperience}
             className={showIntro ? "" : "is-hidden"}

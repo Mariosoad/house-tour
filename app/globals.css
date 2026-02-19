@@ -41,35 +41,68 @@ body {
   position: relative;
 }
 
-.overlay-glass {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
+/* Unified tour UI style (glass panel + buttons) */
+.tour-ui-glass,
+.tour-ui-btn {
+  background: rgba(32, 32, 36, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.9);
+}
+.tour-ui-glass {
+  padding: 0.5rem 0.75rem;
+  border-radius: 20px;
   font-size: 0.875rem;
 }
+.tour-ui-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.tour-ui-btn:hover {
+  background: rgba(48, 48, 52, 0.95);
+  border-color: rgba(255, 255, 255, 0.15);
+}
 
-.overlay-top-right {
+/* Brand logo - top center */
+.tour-ui__brand {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: none;
+}
+.tour-ui__brand-img {
+  height: 36px;
+  width: auto;
+  max-width: 160px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* FPS + metrics - top right */
+.metrics-overlay {
   position: absolute;
   top: 1rem;
   right: 1rem;
   z-index: 10;
 }
-
 .metrics-overlay .metrics-panel {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.6rem 0.75rem;
-  min-width: 120px;
+  align-items: flex-end;
+  padding: 0.6rem 0.9rem;
+  border-radius: 20px;
+  background: rgba(32, 32, 36, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .metrics-section {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
+  align-items: flex-end;
 }
 .metrics-label {
   font-size: 0.65rem;
@@ -78,32 +111,39 @@ body {
   opacity: 0.8;
 }
 .metrics-fps {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.95);
 }
 .metrics-toggle {
-  margin-top: 0.25rem;
-  padding: 0.4rem 0.6rem;
-  font-size: 0.75rem;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
-  color: inherit;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.25);
+  color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.2s, border-color 0.2s;
 }
 .metrics-toggle:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
-.overlay-scroll-hint {
-  position: absolute;
+/* Bottom bar - all buttons in horizontal row */
+.tour-bottom-bar {
+  position: fixed;
+  bottom: 24px;
   left: 50%;
-  bottom: 2rem;
   transform: translateX(-50%);
-  z-index: 10;
+  z-index: 100;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 /* Waypoints (dots) */

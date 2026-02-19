@@ -18,7 +18,7 @@ export function IntroOverlay({ onStart, className = "" }: IntroOverlayProps) {
       <div className="intro-overlay__content">
         <p className="intro-overlay__subtitle">THREEJS SSGI & N8A0 <br /> DEMO BY GEMDAM</p>
        
-        <div className="intro-overlay__logo">
+        {/* <div className="intro-overlay__logo">
           <Image
             src="/logo-gemdam.png"
             alt="Gemdam"
@@ -27,7 +27,7 @@ export function IntroOverlay({ onStart, className = "" }: IntroOverlayProps) {
             priority
             className="intro-overlay__logo-img"
           />
-        </div>
+        </div> */}
          <button
           type="button"
           className="intro-overlay__btn"

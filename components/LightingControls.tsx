@@ -7,6 +7,8 @@ export type LightingControlsProps = {
   sunRotation: number;
   onTimeOfDayChange: (v: number) => void;
   onSunRotationChange: (v: number) => void;
+  /** When true, the collapsed button renders inline (no position fixed) for use in a bottom bar */
+  embedded?: boolean;
 };
 
 const PRESETS: { label: string; time: number; rotation: number }[] = [
@@ -33,9 +35,10 @@ export function LightingControls({
   sunRotation,
   onTimeOfDayChange,
   onSunRotationChange,
+  embedded = false,
 }: LightingControlsProps) {
   const [preset, setPreset] = useState<string>("Dusk");
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const hourMinRef = useRef<HTMLSpanElement>(null);
   const ampmRef = useRef<HTMLSpanElement>(null);
@@ -92,22 +95,15 @@ export function LightingControls({
     return (
       <button
         type="button"
+        className="tour-ui-btn"
         onClick={() => setOpen(true)}
         aria-label="Abrir controles de iluminación"
-        style={{
+        style={embedded ? undefined : {
           position: "fixed",
           bottom: 24,
           left: "50%",
           transform: "translateX(-50%)",
           zIndex: 100,
-          padding: "10px 18px",
-          borderRadius: 20,
-          background: "rgba(32, 32, 36, 0.95)",
-          border: "1px solid rgba(255,255,255,0.08)",
-          color: "rgba(255,255,255,0.8)",
-          fontSize: 13,
-          cursor: "pointer",
-          fontFamily: "inherit",
         }}
       >
         Time of day
