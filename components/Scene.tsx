@@ -76,19 +76,39 @@ export function Scene({
       </group>
       {!webgpu && contactEnabled && (
         <ContactShadows
-          position={[0, -0.01, 0]}
-          scale={15}
-          far={15}
-          opacity={contactShadowsConfig?.opacity ?? 0.65}
-          blur={contactShadowsConfig?.blur ?? 3}
-          resolution={contactShadowsConfig?.resolution ?? 1024}
+          position={[0, -0.005, 0]}
+          scale={10}
+          far={6}
+          opacity={contactShadowsConfig?.opacity ?? 0.35}
+          blur={contactShadowsConfig?.blur ?? 2}
+          resolution={contactShadowsConfig?.resolution ?? 2048}
         />
       )}
       {ssaoEnabled && (
-        <EffectComposer enableNormalPass resolutionScale={0.5}>
-          <SSAO radius={20} intensity={1} bias={0.5} />
-        </EffectComposer>
-      )}
+      <EffectComposer enableNormalPass resolutionScale={0.75}>
+        {/* MICRO AO: detalles, uniones, contacto fino */}
+        <SSAO
+          samples={16}
+          rings={4}
+          radius={0.25}
+          intensity={1.15}
+          bias={0.02}
+          distanceThreshold={0.8}
+          distanceFalloff={0.4}
+        />
+
+        {/* MACRO AO: esquinas grandes MUY sutil */}
+        <SSAO
+          samples={8}
+          rings={3}
+          radius={1.2}
+          intensity={0.22}
+          bias={0.08}
+          distanceThreshold={3.0}
+          distanceFalloff={1.0}
+        />
+      </EffectComposer>
+    )}
     </>
   );
 }

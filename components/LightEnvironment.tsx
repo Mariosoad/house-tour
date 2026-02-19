@@ -45,10 +45,11 @@ export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0 }: LightEnv
   }, []);
   const pos = sunPosition(timeOfDay, sunRotation);
   const { color, intensity } = sunColorAndIntensity(timeOfDay);
-  const envIntensity = 0.06 + 0.12 * (0.5 - Math.abs((timeOfDay * 14 + 5 - 12) / 14));
+  const envIntensity = 0.25 + 0.35 * (1 - Math.min(1, Math.abs((timeOfDay * 14 + 5 - 12) / 7)));
+
   return (
     <>
-      <ambientLight intensity={0.1} />
+      <ambientLight intensity={0.02} />
       <primitive object={lightTarget} />
       <directionalLight
         position={[pos.x, pos.y, pos.z]}
@@ -56,14 +57,14 @@ export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0 }: LightEnv
         color={color}
         castShadow
         shadow-mapSize={[2048, 2048]}
-        shadow-camera-near={2}
-        shadow-camera-far={120}
-        shadow-camera-top={15}
-        shadow-camera-right={15}
-        shadow-camera-bottom={-15}
-        shadow-camera-left={-15}
-        shadow-bias={-0.001}
-        shadow-normalBias={0.02}
+        shadow-camera-near={1}
+        shadow-camera-far={40}
+        shadow-camera-top={6}
+        shadow-camera-right={6}
+        shadow-camera-bottom={-6}
+        shadow-camera-left={-6}
+        shadow-bias={-0.0005}
+        shadow-normalBias={0.01}
       />
       <Environment
         preset="warehouse"

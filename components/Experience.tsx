@@ -64,15 +64,18 @@ function TourExperienceInner() {
         aria-label="3D scroll tour"
       >
         <Canvas
-          dpr={[1, 1.5]}
-          camera={{ position: [...INITIAL_CAMERA_POSITION], fov: 42, near: 0.1, far: 100 }}
+          shadows
+          dpr={[1, 2]}
           gl={{
             antialias: true,
             toneMapping: THREE.ACESFilmicToneMapping,
-            toneMappingExposure: 1,
-            outputColorSpace: THREE.SRGBColorSpace,
+            toneMappingExposure: 1.0,
           }}
-          shadows
+          onCreated={({ gl }) => {
+            gl.outputColorSpace = THREE.SRGBColorSpace;
+            gl.shadowMap.enabled = true;
+            gl.shadowMap.type = THREE.PCFSoftShadowMap;
+          }}
           style={{ display: "block", width: "100%", height: "100%" }}
         >
           <color attach="background" args={["#111"]} />
