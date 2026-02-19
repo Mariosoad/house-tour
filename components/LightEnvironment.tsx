@@ -21,7 +21,7 @@ function sunColorAndIntensity(timeOfDay: number): { color: THREE.Color; intensit
   const distFromMidday = Math.abs(t - midday) * 2;
   const warmth = 1 - distFromMidday;
   const kelvin = 5500 + warmth * 3500;
-  const intensity = 1.8 + (1 - distFromMidday) * 2.2;
+  const intensity = 2 + (1 - distFromMidday) * 2.2;
   const r = kelvin <= 6600 ? 1 : Math.min(1, 1.292 - (kelvin - 6600) / 3400);
   const g =
     kelvin <= 6600
@@ -68,7 +68,7 @@ export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0 }: LightEnv
       />
       <Environment
         preset="warehouse"
-        environmentIntensity={Math.max(0.05, envIntensity)}
+        environmentIntensity={Math.max(0.08, envIntensity)}
         environmentRotation={[0.4, 0, 1.4]}
       />
     </>

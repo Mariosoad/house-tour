@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef } from "react";
 import * as THREE from "three";
 import { ContactShadows } from "@react-three/drei";
-import { EffectComposer, N8AO, SSAO } from "@react-three/postprocessing";
+import { EffectComposer, N8AO } from "@react-three/postprocessing";
 import { useMetrics } from "@/lib/metricsContext";
 import { Light_Environment } from "./LightEnvironment";
 import { House } from "./House";
@@ -112,10 +112,11 @@ export function Scene({
         // </EffectComposer>
         <EffectComposer enableNormalPass multisampling={0}>
           <N8AO
-            aoRadius={0.35}
+            aoRadius={0.25}
             intensity={5.0}
-            distanceFalloff={0.6}
-            quality="high"
+            distanceFalloff={0.5}
+            quality="ultra"
+            color="black"
           />
         </EffectComposer>
       )}
