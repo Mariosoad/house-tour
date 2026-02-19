@@ -68,6 +68,7 @@ export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0 }: LightEnv
       />
       <Environment
         files="/pretoria_gardens_2k.hdr"
+        background
         environmentIntensity={Math.max(0.08, envIntensity)}
         environmentRotation={[0.4, 0, 1.4]}
       />
