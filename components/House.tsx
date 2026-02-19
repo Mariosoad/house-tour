@@ -87,6 +87,12 @@ export function House({ parentGroupRef }: { parentGroupRef: RefObject<THREE.Grou
             key={m.uuid}
             sourceMesh={m}
             parentGroupRef={parentGroupRef}
+            rotationX={90}
+            rotationY={0}
+            rotationZ={0}
+            offsetX={0}
+            offsetY={0.15}
+            offsetZ={-4.12}
           />
         ))}
     </>
