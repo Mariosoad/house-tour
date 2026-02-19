@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef } from "react";
 import * as THREE from "three";
 import { ContactShadows } from "@react-three/drei";
-import { EffectComposer, SSAO } from "@react-three/postprocessing";
+import { EffectComposer, N8AO, SSAO } from "@react-three/postprocessing";
 import { useMetrics } from "@/lib/metricsContext";
 import { Light_Environment } from "./LightEnvironment";
 import { House } from "./House";
@@ -85,30 +85,40 @@ export function Scene({
         />
       )}
       {ssaoEnabled && (
-      <EffectComposer enableNormalPass resolutionScale={0.75}>
-        {/* MICRO AO: detalles, uniones, contacto fino */}
-        <SSAO
-          samples={16}
-          rings={4}
-          radius={0.25}
-          intensity={1.15}
-          bias={0.02}
-          distanceThreshold={0.8}
-          distanceFalloff={0.4}
-        />
+        // <EffectComposer enableNormalPass multisampling={0}>
+        //   {/* MICRO AO: contactos reales */}
+        //   <SSAO
+        //     samples={16}
+        //     rings={4}
+        //     radius={0.22}
+        //     intensity={1.25}
+        //     bias={0.02}
+        //     distanceThreshold={0.8}
+        //     distanceFalloff={0.35}
+        //     luminanceInfluence={0.3}
+        //   />
 
-        {/* MACRO AO: esquinas grandes MUY sutil */}
-        <SSAO
-          samples={8}
-          rings={3}
-          radius={1.2}
-          intensity={0.22}
-          bias={0.08}
-          distanceThreshold={3.0}
-          distanceFalloff={1.0}
-        />
-      </EffectComposer>
-    )}
+        //   {/* MACRO AO: esquinas grandes, MUY sutil */}
+        //   <SSAO
+        //     samples={8}
+        //     rings={3}
+        //     radius={1.1}
+        //     intensity={0.18}
+        //     bias={0.08}
+        //     distanceThreshold={3.0}
+        //     distanceFalloff={1.0}
+        //     luminanceInfluence={0.2}
+        //   />
+        // </EffectComposer>
+        <EffectComposer enableNormalPass multisampling={0}>
+          <N8AO
+            aoRadius={0.35}
+            intensity={1.1}
+            distanceFalloff={0.6}
+            quality="high"
+          />
+        </EffectComposer>
+      )}
     </>
   );
 }

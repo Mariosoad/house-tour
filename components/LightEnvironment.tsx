@@ -65,11 +65,7 @@ export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0 }: LightEnv
         shadow-bias={-0.0005}
         shadow-normalBias={0.01}
       />
-      <Environment
-        preset="warehouse"
-        environmentIntensity={Math.max(0.08, envIntensity)}
-        environmentRotation={[0.4, 0, 1.4]}
-      />
+      <Environment preset="warehouse" environmentIntensity={0.35} />
     </>
   );
 }
