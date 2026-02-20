@@ -9,7 +9,7 @@ import { MirrorReplica } from "./MirrorReplica";
 
 type GLTFResult = { scene: THREEType.Group };
 
-const MODEL_URL = "/DeluxeVilla.glb";
+const MODEL_URL = "/DeluxeVilla2.glb";
 
 const GLASS_NAMES = /vidrio|glass|cristal|window|ventana|cerramiento|crystal|pane/i;
 const MIRROR_NAMES = /espejo|mirror|reflector/i;
@@ -47,13 +47,13 @@ export function House({ parentGroupRef }: { parentGroupRef: RefObject<THREE.Grou
               materials[i] = new THREE.MeshPhysicalMaterial({
                 color: 0xcfe9ff,
                 transmission: 1,
-                opacity: 0.3,
+                opacity: 0.7,
                 transparent: true,
                 depthWrite: false,
-                roughness: 0.05,
+                roughness: 0.1,
                 metalness: 0,
-                ior: 1.5,
-                thickness: 0.2,
+                ior: 1,
+                thickness: 0.5,
               });
               mesh.userData.cannotReceiveAO = true;
             }
@@ -66,13 +66,13 @@ export function House({ parentGroupRef }: { parentGroupRef: RefObject<THREE.Grou
             mesh.material = new THREE.MeshPhysicalMaterial({
               color: 0xcfe9ff,
               transmission: 1,
-              opacity: 0.3,
+              opacity: 0.7,
               transparent: true,
               depthWrite: false,
-              roughness: 0.05,
+              roughness: 0.1,
               metalness: 0,
-              ior: 1.5,
-              thickness: 0.2,
+              ior: 1,
+              thickness: 0.5,
             });
             mesh.userData.cannotReceiveAO = true;
           }
