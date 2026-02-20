@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef } from "react";
 import * as THREE from "three";
 import { ContactShadows } from "@react-three/drei";
-import { EffectComposer, N8AO } from "@react-three/postprocessing";
+import { EffectComposer, N8AO, Bloom, HueSaturation } from "@react-three/postprocessing";
 import { useMetrics } from "@/lib/metricsContext";
 import { Light_Environment } from "./LightEnvironment";
 import { House } from "./House";
@@ -86,12 +86,20 @@ export function Scene({
       )}
       {ssaoEnabled && (
         <EffectComposer enableNormalPass multisampling={0}>
+          {/* Glass/vidrio excluded via mesh.userData.cannotReceiveAO in House.tsx */}
           <N8AO
-            aoRadius={1.5}
-            intensity={2.0}
+            aoRadius={0.5}
+            intensity={0.7}
             distanceFalloff={0.5}
             quality="ultra"
           />
+          <Bloom
+            luminanceThreshold={0.9}
+            luminanceSmoothing={0.2}
+            intensity={0.25}
+            mipmapBlur
+          />
+          <HueSaturation saturation={0.10} />
         </EffectComposer>
       )}
     </>
