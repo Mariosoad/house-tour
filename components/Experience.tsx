@@ -78,9 +78,11 @@ function TourExperienceInner({
           gl={{
             antialias: true,
             toneMapping: THREE.ACESFilmicToneMapping,
-            toneMappingExposure: 0.8,
+            toneMappingExposure: 1.1,
           }}
           onCreated={({ gl }) => {
+            // @ts-expect-error - physicallyCorrectLights exists on WebGLRenderer at runtime
+            gl.physicallyCorrectLights = true;
             gl.outputColorSpace = THREE.SRGBColorSpace;
             gl.shadowMap.enabled = true;
             gl.shadowMap.type = THREE.PCFSoftShadowMap;
