@@ -45,11 +45,14 @@ export function House({ parentGroupRef }: { parentGroupRef: RefObject<THREE.Grou
             } else if (isGlassMaterial(mat)) {
               hasGlass = true;
               materials[i] = new THREE.MeshPhysicalMaterial({
+                color: 0xcfe9ff,
                 transmission: 1,
+                opacity: 1,
                 transparent: true,
                 depthWrite: false,
-                roughness: 0,
+                roughness: 0.05,
                 metalness: 0,
+                ior: 1.5,
                 thickness: 0.2,
               });
               mesh.userData.cannotReceiveAO = true;
@@ -61,11 +64,14 @@ export function House({ parentGroupRef }: { parentGroupRef: RefObject<THREE.Grou
           } else if (isGlassMaterial(mesh.material)) {
             hasGlass = true;
             mesh.material = new THREE.MeshPhysicalMaterial({
+              color: 0xcfe9ff,
               transmission: 1,
+              opacity: 1,
               transparent: true,
               depthWrite: false,
-              roughness: 0,
+              roughness: 0.05,
               metalness: 0,
+              ior: 1.5,
               thickness: 0.2,
             });
             mesh.userData.cannotReceiveAO = true;
