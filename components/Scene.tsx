@@ -80,7 +80,7 @@ function PostEffects() {
   return (
     <EffectComposer enableNormalPass={needsNormalPass} multisampling={0}>
       {activeEffect}
-      {needsToneMappingCompensation && <ToneMappingEffectPrimitive />}
+      {needsToneMappingCompensation ? <ToneMappingEffectPrimitive /> : <></>}
       <OutputPass />
     </EffectComposer>
   );
