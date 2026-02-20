@@ -83,7 +83,7 @@ function TourExperienceInner({
           onCreated={({ gl }) => {
             // @ts-expect-error - physicallyCorrectLights exists on WebGLRenderer at runtime
             gl.physicallyCorrectLights = true;
-            gl.outputColorSpace = THREE.SRGBColorSpace;
+            gl.outputColorSpace = THREE.LinearSRGBColorSpace;
             gl.shadowMap.enabled = true;
             gl.shadowMap.type = THREE.PCFSoftShadowMap;
           }}
