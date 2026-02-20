@@ -9,9 +9,6 @@ import { Light_Environment } from "./LightEnvironment";
 import { House } from "./House";
 
 import {
-  BloomEffect,
-  VignetteEffect,
-  BrightnessContrastEffect,
   ToneMappingEffect,
   ToneMappingMode,
 } from "postprocessing";
@@ -82,8 +79,6 @@ export type SceneProps = {
 export function Scene({
   timeOfDay = 0.4,
   sunRotation = 0,
-  webgpu = false,
-  contactShadows: contactShadowsConfig,
 }: SceneProps) {
   const houseGroupRef = useRef<THREE.Group>(null);
   const { ssaoEnabled } = useMetrics();

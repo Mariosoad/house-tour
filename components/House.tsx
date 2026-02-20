@@ -48,12 +48,12 @@ export function House({ parentGroupRef }: { parentGroupRef: RefObject<THREE.Grou
               materials[i] = new THREE.MeshPhysicalMaterial({
                 color: 0xcfe9ff,
                 transmission: 1,
-                opacity: 0.7,
+                opacity: 0.6,
                 transparent: true,
                 depthWrite: false,
                 roughness: 0.1,
                 metalness: 0,
-                ior: 1,
+                ior: 1.2,
                 thickness: 0.5,
               });
               mesh.userData.cannotReceiveAO = true;
