@@ -4,7 +4,7 @@ import type { MutableRefObject, RefObject } from "react";
 import { useCallback, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { MeshReflectorMaterial } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 
 type MirrorReplicaProps = {
   sourceMesh: THREE.Mesh;
@@ -54,6 +54,7 @@ function createMirrorPlaneGeometry(mesh: THREE.Mesh): THREE.PlaneGeometry | null
 /** Renders a plane with MeshReflectorMaterial, synced to the mirror mesh position/orientation from the model (keeps mirror parallel to wall as designed). */
 export function MirrorReplica({ sourceMesh, parentGroupRef, rotationX, rotationY, rotationZ, offsetX, offsetY, offsetZ }: MirrorReplicaProps) {
   const meshRef = useRef<THREE.Mesh>(null);
+  const scene = useThree((s) => s.scene);
   const matrix = useRef(new THREE.Matrix4());
   const invParent = useRef(new THREE.Matrix4());
 
@@ -102,6 +103,7 @@ export function MirrorReplica({ sourceMesh, parentGroupRef, rotationX, rotationY
   return (
     <mesh ref={setRef} geometry={geometry} renderOrder={1}>
       <MeshReflectorMaterial
+        color="#ffffff"
         emissive="#000"
         emissiveIntensity={0}
         mixContrast={1}
@@ -113,6 +115,7 @@ export function MirrorReplica({ sourceMesh, parentGroupRef, rotationX, rotationY
         minDepthThreshold={0}
         maxDepthThreshold={1}
         reflectorOffset={0.001}
+        envMap={scene.environment}
       />
     </mesh>
   );
