@@ -51,6 +51,7 @@ export function House({ parentGroupRef }: { parentGroupRef: RefObject<THREE.Grou
                 metalness: 0,
                 thickness: 0.5,
               });
+              mesh.userData.cannotReceiveAO = true;
             }
           });
         } else if (mesh.material) {
@@ -65,6 +66,7 @@ export function House({ parentGroupRef }: { parentGroupRef: RefObject<THREE.Grou
               metalness: 0,
               thickness: 0.5,
             });
+            mesh.userData.cannotReceiveAO = true;
           }
         }
         if (hasMirror) {
