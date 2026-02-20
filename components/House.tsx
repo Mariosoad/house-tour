@@ -101,8 +101,8 @@ export function House({ parentGroupRef }: { parentGroupRef: RefObject<THREE.Grou
             rotationY={0}
             rotationZ={0}
             offsetX={0}
-            offsetY={0.15}
-            offsetZ={-4.12}
+            offsetY={-0.35}
+            offsetZ={-4.58}
           />
         ))}
     </>
