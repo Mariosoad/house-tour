@@ -102,12 +102,11 @@ export function MirrorReplica({ sourceMesh, parentGroupRef, rotationX, rotationY
   return (
     <mesh ref={setRef} geometry={geometry} renderOrder={1}>
       <MeshReflectorMaterial
-        color="#ffffff"
-        emissive="#222"
-        emissiveIntensity={0.15}
-        mixContrast={1.15}
+        emissive="#000"
+        emissiveIntensity={0}
+        mixContrast={1}
         blur={[0, 0]}
-        resolution={1024}
+        resolution={2048}
         mixBlur={0}
         mixStrength={1}
         mirror={1}
