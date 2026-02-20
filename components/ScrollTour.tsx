@@ -7,35 +7,10 @@ import { damp } from "@/lib/math";
 import { useTourScroll } from "@/lib/tourScrollContext";
 import { useMetrics } from "@/lib/metricsContext";
 import { INITIAL_CAMERA_POSITION, INITIAL_CAMERA_TARGET } from "@/lib/waypoints";
+import { getPositionCurve, getTargetCurve } from "@/lib/tourCurves";
 
-const DAMPING = 3;
-const JUMP_EASE_SPEED = 1.2;
-
-/** Curva de POSICIONES: 1 → 2 → 3 → 4 → 1 (primer punto duplicado para transición directa, sin glitch) */
-function getPositionCurve(): THREE.CatmullRomCurve3 {
-  const p1 = new THREE.Vector3(-0.0, 0.45, 1.66);
-  const points = [
-    p1.clone(),                             // 1
-    new THREE.Vector3(1.07, 0.67, 0.18),   // 2
-    new THREE.Vector3(0.93, 0.72, -0.91),  // 3
-    new THREE.Vector3(-0.76, 0.73, -1.09), // 4
-    p1,                                     // 1 de nuevo → tramo 4→1 directo
-  ];
-  return new THREE.CatmullRomCurve3(points, false);
-}
-
-/** Curva de MIRADAS (targets): 1 → 2 → 3 → 4 → 1 */
-function getTargetCurve(): THREE.CatmullRomCurve3 {
-  const t1 = new THREE.Vector3(-1.62, -0.18, -3.03);
-  const points = [
-    t1.clone(),                             // 1
-    new THREE.Vector3(-3.72, -0.55, 0.92),  // 2
-    new THREE.Vector3(-3.34, -0.3, 1.49),   // 3
-    new THREE.Vector3(3.44, -0.12, 1.5),    // 4
-    t1,                                     // 1 de nuevo
-  ];
-  return new THREE.CatmullRomCurve3(points, false);
-}
+const DAMPING = 1.8;
+const JUMP_EASE_SPEED = 0.8;
 
 export function ScrollTour() {
   const { camera } = useThree();
@@ -76,12 +51,24 @@ export function ScrollTour() {
       const dist = Math.abs(currentT.current - targetT);
       if (dist < 0.001) {
         targetProgressRef.current = null;
-        setProgress(currentT.current);
+        setProgress(((currentT.current % 1) + 1) % 1);
       }
     } else {
-      // Follow scroll-driven progress with damping
-      currentT.current = damp(currentT.current, progressRef.current, DAMPING, delta);
-      t = currentT.current;
+      // Follow scroll: ajustar target para loop infinito (evitar glitch al cruzar 1→0)
+      const raw = progressRef.current;
+      let targetAdjusted = raw;
+      const cur = currentT.current;
+      const dBack = cur - raw;
+      const dFwd = raw + 1 - cur;
+      if (dBack > 0.5 && dFwd < dBack) targetAdjusted = raw + 1;
+      else if (dBack < -0.5 && -dBack > cur + 1 - raw) targetAdjusted = raw - 1;
+
+      currentT.current = damp(cur, targetAdjusted, DAMPING, delta);
+      // Evitar deriva: si estamos cerca del target y currentT fuera de [0,1], normalizar
+      if (Math.abs(currentT.current - targetAdjusted) < 0.02 && (currentT.current >= 1 || currentT.current < 0)) {
+        currentT.current = raw;
+      }
+      t = ((currentT.current % 1) + 1) % 1; // curva usa t en [0,1)
     }
 
     positionCurve.getPointAt(t, currentPosition.current);

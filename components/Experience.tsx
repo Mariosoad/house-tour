@@ -17,6 +17,7 @@ import { MetricsOverlay } from "@/components/MetricsOverlay";
 import { TourBottomBar } from "@/components/TourBottomBar";
 import { TourDebugProvider } from "@/lib/tourDebugContext";
 import { IntroOverlay } from "@/components/IntroOverlay";
+import { TourDebugOverlay } from "@/components/TourDebugOverlay";
 
 function FallbackContent() {
   return (
@@ -101,6 +102,7 @@ function TourExperienceInner({ hasStarted }: { hasStarted: boolean }) {
             </div>
             <MetricsOverlay />
             <WaypointsUI />
+            <TourDebugOverlay />
             <TourBottomBar
               timeOfDay={timeOfDay}
               sunRotation={sunRotation}
