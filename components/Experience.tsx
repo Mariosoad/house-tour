@@ -17,6 +17,7 @@ import { MetricsOverlay } from "@/components/MetricsOverlay";
 import { TourBottomBar } from "@/components/TourBottomBar";
 import { TourDebugProvider } from "@/lib/tourDebugContext";
 import { IntroOverlay } from "@/components/IntroOverlay";
+import { LoadedReporter } from "@/components/LoadedReporter";
 import { TourDebugOverlay } from "@/components/TourDebugOverlay";
 
 function FallbackContent() {
@@ -36,7 +37,13 @@ const sceneContactShadows = {
   scaleMultiplier: 1.2,
 };
 
-function TourExperienceInner({ hasStarted }: { hasStarted: boolean }) {
+function TourExperienceInner({
+  hasStarted,
+  onLoadingComplete,
+}: {
+  hasStarted: boolean;
+  onLoadingComplete?: () => void;
+}) {
   const { addDelta } = useTourScroll();
   const { freeCamera } = useMetrics();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -82,6 +89,7 @@ function TourExperienceInner({ hasStarted }: { hasStarted: boolean }) {
         >
           <color attach="background" args={["#111"]} />
           <Suspense fallback={<FallbackContent />}>
+            {onLoadingComplete && <LoadedReporter onLoaded={onLoadingComplete} />}
             <Scene
               timeOfDay={timeOfDay}
               sunRotation={sunRotation}
@@ -120,6 +128,7 @@ const INTRO_ZOOM_PROGRESS = 0.1;
 
 function ExperienceWithIntro() {
   const [showIntro, setShowIntro] = useState(true);
+  const [loadingPage, setLoadingPage] = useState(true);
   const { setTargetProgress } = useTourScroll();
 
   const handleStartExperience = useCallback(() => {
@@ -127,11 +136,19 @@ function ExperienceWithIntro() {
     setTargetProgress(INTRO_ZOOM_PROGRESS);
   }, [setTargetProgress]);
 
+  const handleLoadingComplete = useCallback(() => {
+    setLoadingPage(false);
+  }, []);
+
   return (
     <div style={{ width: "100%", height: "100vh", position: "relative" }}>
-      <TourExperienceInner hasStarted={!showIntro} />
+      <TourExperienceInner
+        hasStarted={!showIntro}
+        onLoadingComplete={handleLoadingComplete}
+      />
       <IntroOverlay
         onStart={handleStartExperience}
+        loadingPage={loadingPage}
         className={showIntro ? "" : "is-hidden"}
       />
     </div>
