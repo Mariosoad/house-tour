@@ -1,7 +1,7 @@
 "use client";
 
-import type { RefObject } from "react";
-import { useMemo, useRef } from "react";
+import type { MutableRefObject, RefObject } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { MeshReflectorMaterial } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
@@ -93,12 +93,19 @@ export function MirrorReplica({ sourceMesh, parentGroupRef, rotationX, rotationY
   });
 
   const geometry = useMemo(() => createMirrorPlaneGeometry(sourceMesh), [sourceMesh]);
+  const setRef = useCallback((node: THREE.Mesh | null) => {
+    (meshRef as MutableRefObject<THREE.Mesh | null>).current = node;
+    if (node) node.userData.cannotReceiveAO = true; // Excluir del N8AO para evitar oscurecimiento
+  }, []);
   if (!geometry) return null;
 
   return (
-    <mesh ref={meshRef} geometry={geometry} renderOrder={1}>
+    <mesh ref={setRef} geometry={geometry} renderOrder={1}>
       <MeshReflectorMaterial
         color="#ffffff"
+        emissive="#222"
+        emissiveIntensity={0.15}
+        mixContrast={1.15}
         blur={[0, 0]}
         resolution={1024}
         mixBlur={0}
