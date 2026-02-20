@@ -20,7 +20,7 @@ export function TourBottomBar({
 
   return (
     <div className="tour-bottom-bar">
-      <button
+      {/* <button
         type="button"
         className="tour-ui-btn"
         onClick={() => setFreeCamera(!freeCamera)}
@@ -28,7 +28,7 @@ export function TourBottomBar({
         aria-label={freeCamera ? "Volver a recorrido guiado" : "Activar vista libre"}
       >
         {freeCamera ? "Recorrido guiado" : "Vista libre"}
-      </button>
+      </button> */}
       <LightingControls
         timeOfDay={timeOfDay}
         sunRotation={sunRotation}

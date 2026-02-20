@@ -10,7 +10,7 @@ import { MirrorReplica } from "./MirrorReplica";
 
 type GLTFResult = { scene: THREEType.Group };
 
-const MODEL_URL = "/DeluxeVilla2.glb";
+const MODEL_URL = "/DeluxeVilla1.glb";
 
 const GLASS_NAMES = /vidrio|glass|cristal|window|ventana|cerramiento|crystal|pane/i;
 const MIRROR_NAMES = /espejo|mirror|reflector/i;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-as-const */
 "use client";
 
 import { useLayoutEffect, useMemo, useRef } from "react";
@@ -16,11 +17,7 @@ import {
 } from "postprocessing";
 import { SSAO as SSAOEffect } from "./effects/SSAO";
 
-/**
- * Cambia este valor para probar diferentes efectos de postprocesado.
- * Opciones: 'ssao' | 'bloom' | 'vignette' | 'brightnessContrast' | 'toneMapping'
- */
-const ACTIVE_POST_EFFECT: "ssao" | "bloom" | "vignette" | "brightnessContrast" | "toneMapping" = "ssao";
+const ACTIVE_POST_EFFECT: "ssao" = "ssao";
 
 import { CopyPass } from "postprocessing";
 
@@ -28,24 +25,6 @@ import { CopyPass } from "postprocessing";
 function OutputPass() {
   const pass = useMemo(() => new CopyPass(), []);
   return <primitive object={pass} />;
-}
-
-function BloomEffectPrimitive() {
-  const instance = useMemo(
-    () => new BloomEffect({ luminanceThreshold: 0.9, mipmapBlur: true, intensity: 0.5 }),
-    []
-  );
-  return <primitive object={instance} dispose={null} />;
-}
-
-function VignetteEffectPrimitive() {
-  const instance = useMemo(() => new VignetteEffect({ offset: 0.5, darkness: 0.8 }), []);
-  return <primitive object={instance} dispose={null} />;
-}
-
-function BrightnessContrastEffectPrimitive() {
-  const instance = useMemo(() => new BrightnessContrastEffect({ brightness: 0.05, contrast: 0.1 }), []);
-  return <primitive object={instance} dispose={null} />;
 }
 
 /** ACES Filmic + exposure 1.0 to match Canvas config — avoids color shift when only AO is active */
@@ -64,31 +43,22 @@ function PostEffects() {
   const needsNormalPass = ACTIVE_POST_EFFECT === "ssao";
 
   const activeEffect =
-    ACTIVE_POST_EFFECT === "ssao" ? (
+    ACTIVE_POST_EFFECT === "ssao" && (
       <SSAOEffect
-        radius={0.1}
-        intensity={1.3}
+        radius={0.05}
+        intensity={1.7}
+        rangeFalloff={0.5}
         bias={0.03}
         samples={32}
         rings={4}
         luminanceInfluence={0.5}
       />
-    ) : ACTIVE_POST_EFFECT === "bloom" ? (
-      <BloomEffectPrimitive />
-    ) : ACTIVE_POST_EFFECT === "vignette" ? (
-      <VignetteEffectPrimitive />
-    ) : ACTIVE_POST_EFFECT === "brightnessContrast" ? (
-      <BrightnessContrastEffectPrimitive />
-    ) : (
-      <ToneMappingEffectPrimitive />
-    );
-
-  const needsToneMappingCompensation = ACTIVE_POST_EFFECT !== "toneMapping";
+    )
 
   return (
     <EffectComposer enableNormalPass={needsNormalPass} multisampling={0}>
-      {activeEffect}
-      {needsToneMappingCompensation ? <ToneMappingEffectPrimitive /> : <></>}
+      {activeEffect as React.ReactElement}
+      <ToneMappingEffectPrimitive />
       <OutputPass />
     </EffectComposer>
   );

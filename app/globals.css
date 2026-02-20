@@ -400,7 +400,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 12.5rem;
   text-align: center;
   padding: 2rem;
 }
@@ -426,10 +426,12 @@ body {
 .intro-overlay__subtitle {
   margin: 0;
   color: rgba(255, 255, 255, 0.85);
-  font-size: 3.2rem;
+  font-size: 4.5rem;
   font-weight: 600;
+  line-height: 1.4em;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  text-shadow: 2px 5px 10px #0000009f;
 }
 .intro-overlay__btn {
   margin-top: 0.5rem;
@@ -473,6 +475,7 @@ body {
   font-size: 0.8rem;
   letter-spacing: 0.08em;
   opacity: 0.9;
+  text-transform: uppercase;
 }
 @keyframes scroll-hint-bounce {
   0%, 100% { transform: translateY(0); }
