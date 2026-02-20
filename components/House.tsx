@@ -50,7 +50,7 @@ export function House({ parentGroupRef }: { parentGroupRef: RefObject<THREE.Grou
                 depthWrite: false,
                 roughness: 0,
                 metalness: 0,
-                thickness: 0.5,
+                thickness: 0.2,
               });
               mesh.userData.cannotReceiveAO = true;
             }
@@ -66,7 +66,7 @@ export function House({ parentGroupRef }: { parentGroupRef: RefObject<THREE.Grou
               depthWrite: false,
               roughness: 0,
               metalness: 0,
-              thickness: 0.5,
+              thickness: 0.2,
             });
             mesh.userData.cannotReceiveAO = true;
           }

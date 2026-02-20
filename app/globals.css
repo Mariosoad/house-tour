@@ -372,12 +372,27 @@ body {
   visibility: hidden;
   pointer-events: none;
 }
+.intro-overlay__bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 .intro-overlay__backdrop {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.9) 100%);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background-image: url("/fondo-house.webp");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.intro-overlay__backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.693) 0%, rgba(0, 0, 0, 0.759) 100%);
+  pointer-events: none;
 }
 .intro-overlay__content {
   position: relative;

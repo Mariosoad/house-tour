@@ -102,7 +102,7 @@ function TourExperienceInner({ hasStarted }: { hasStarted: boolean }) {
             </div>
             <MetricsOverlay />
             <WaypointsUI />
-            <TourDebugOverlay />
+            {/* <TourDebugOverlay /> */}
             <TourBottomBar
               timeOfDay={timeOfDay}
               sunRotation={sunRotation}
@@ -116,34 +116,44 @@ function TourExperienceInner({ hasStarted }: { hasStarted: boolean }) {
   );
 }
 
-export function Experience() {
+const INTRO_ZOOM_PROGRESS = 0.1;
+
+function ExperienceWithIntro() {
   const [showIntro, setShowIntro] = useState(true);
+  const { setTargetProgress } = useTourScroll();
 
   const handleStartExperience = useCallback(() => {
     setShowIntro(false);
-  }, []);
+    setTargetProgress(INTRO_ZOOM_PROGRESS);
+  }, [setTargetProgress]);
 
-  const keyboardMap = [
-    { name: "forward", keys: ["KeyW", "ArrowUp"] },
-    { name: "backward", keys: ["KeyS", "ArrowDown"] },
-    { name: "left", keys: ["KeyA", "ArrowLeft"] },
-    { name: "right", keys: ["KeyD", "ArrowRight"] },
-  ];
+  return (
+    <div style={{ width: "100%", height: "100vh", position: "relative" }}>
+      <TourExperienceInner hasStarted={!showIntro} />
+      <IntroOverlay
+        onStart={handleStartExperience}
+        className={showIntro ? "" : "is-hidden"}
+      />
+    </div>
+  );
+}
 
+const keyboardMap = [
+  { name: "forward", keys: ["KeyW", "ArrowUp"] },
+  { name: "backward", keys: ["KeyS", "ArrowDown"] },
+  { name: "left", keys: ["KeyA", "ArrowLeft"] },
+  { name: "right", keys: ["KeyD", "ArrowRight"] },
+];
+
+export function Experience() {
   return (
     <TourScrollProvider>
       <TourDebugProvider>
         <MetricsProvider>
-        <KeyboardControls map={keyboardMap}>
-        <div style={{ width: "100%", height: "100vh", position: "relative" }}>
-          <TourExperienceInner hasStarted={!showIntro} />
-          <IntroOverlay
-            onStart={handleStartExperience}
-            className={showIntro ? "" : "is-hidden"}
-          />
-        </div>
-        </KeyboardControls>
-      </MetricsProvider>
+          <KeyboardControls map={keyboardMap}>
+            <ExperienceWithIntro />
+          </KeyboardControls>
+        </MetricsProvider>
       </TourDebugProvider>
     </TourScrollProvider>
   );

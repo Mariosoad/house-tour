@@ -21,7 +21,7 @@ export type TourScrollContextValue = {
 
 const TourScrollContext = createContext<TourScrollContextValue | null>(null);
 
-const SCROLL_SPEED = 0.0005;
+const SCROLL_SPEED = 0.0004;
 
 export function TourScrollProvider({ children }: { children: React.ReactNode }) {
   const progressRef = useRef(0);
