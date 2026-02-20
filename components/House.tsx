@@ -47,6 +47,7 @@ export function House({ parentGroupRef }: { parentGroupRef: RefObject<THREE.Grou
               materials[i] = new THREE.MeshPhysicalMaterial({
                 transmission: 1,
                 transparent: true,
+                depthWrite: false,
                 roughness: 0,
                 metalness: 0,
                 thickness: 0.5,
@@ -62,6 +63,7 @@ export function House({ parentGroupRef }: { parentGroupRef: RefObject<THREE.Grou
             mesh.material = new THREE.MeshPhysicalMaterial({
               transmission: 1,
               transparent: true,
+              depthWrite: false,
               roughness: 0,
               metalness: 0,
               thickness: 0.5,

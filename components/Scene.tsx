@@ -86,6 +86,7 @@ export function Scene({
       )}
       {ssaoEnabled && (
         <EffectComposer enableNormalPass multisampling={0}>
+          {/* Glass/vidrio excluded via mesh.userData.cannotReceiveAO in House.tsx */}
           <N8AO
             aoRadius={0.20}
             intensity={5.0}
