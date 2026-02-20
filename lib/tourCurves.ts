@@ -27,7 +27,7 @@ export function getTargetCurve(): THREE.CatmullRomCurve3 {
     new THREE.Vector3(3.35, -0.06, -0.77),    // 3: Exterior patio/árboles
     new THREE.Vector3(-4.7, 0.32, -1.72),      // 4: Bañera, vanity, ventana
     new THREE.Vector3(4.05, 0.35, -0.02), 
-    new THREE.Vector3(-0.88, 0.2, -5.45),       // 6: Ventanas y cama
+    new THREE.Vector3(-3.88, 0.2, -5.45),       // 6: Ventanas y cama
     new THREE.Vector3(-3.92, 0.50, 0.20),         // 7: Bañera y plantas exterior
     new THREE.Vector3(-3.82, 0.20, 1.40),        // 8: Vanity y vista exterior
     t1,                                        // 1 de nuevo
