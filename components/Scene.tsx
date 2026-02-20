@@ -12,6 +12,7 @@ import {
   VignetteEffect,
   BrightnessContrastEffect,
   ToneMappingEffect,
+  ToneMappingMode,
 } from "postprocessing";
 import { SSAO as SSAOEffect } from "./effects/SSAO";
 
@@ -47,8 +48,15 @@ function BrightnessContrastEffectPrimitive() {
   return <primitive object={instance} dispose={null} />;
 }
 
+/** ACES Filmic + exposure 1.0 to match Canvas config — avoids color shift when only AO is active */
 function ToneMappingEffectPrimitive() {
-  const instance = useMemo(() => new ToneMappingEffect(), []);
+  const instance = useMemo(
+    () =>
+      new ToneMappingEffect({
+        mode: ToneMappingMode.ACES_FILMIC,
+      }),
+    []
+  );
   return <primitive object={instance} dispose={null} />;
 }
 
