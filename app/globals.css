@@ -83,6 +83,35 @@ body {
 }
 
 
+/* Fullscreen button - solo mobile */
+.fullscreen-btn {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  width: 44px;
+  height: 44px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(32, 32, 36, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.fullscreen-btn:hover {
+  background: rgba(48, 48, 52, 0.95);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+@media (max-width: 768px) {
+  .fullscreen-btn {
+    display: flex;
+  }
+}
+
 @media (max-width: 768px) {
   .tour-ui__brand {
     top: 1.6rem;
@@ -425,6 +454,10 @@ body {
 }
 
 @media (max-width: 768px) {
+  .waypoints-ui{
+    right: 0.5rem !important;
+    top: 45% !important;
+  }
   .intro-overlay__content {
     gap: 9rem;
   }

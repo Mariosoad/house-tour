@@ -15,6 +15,7 @@ import { FPSReporter } from "@/components/FPSReporter";
 import { WaypointsUI } from "@/components/WaypointsUI";
 import { MetricsOverlay } from "@/components/MetricsOverlay";
 import { TourBottomBar } from "@/components/TourBottomBar";
+import { FullscreenButton } from "@/components/FullscreenButton";
 import { TourDebugProvider } from "@/lib/tourDebugContext";
 import { IntroOverlay } from "@/components/IntroOverlay";
 import { LoadedReporter } from "@/components/LoadedReporter";
@@ -127,6 +128,7 @@ function TourExperienceInner({
             <div className="tour-ui__brand">
               <Image src="/logo-gemdam.png" alt="Gemdam" width={200} height={100} className="tour-ui__brand-img" />
             </div>
+            <FullscreenButton />
             {/* <MetricsOverlay /> */}
             <WaypointsUI />
             {/* <TourDebugOverlay /> */}
