@@ -36,7 +36,7 @@ export function TourBottomBar({
         onSunRotationChange={onSunRotationChange}
         embedded
       />
-      <button
+      {/* <button
         type="button"
         className="tour-ui-btn"
         onClick={() => setSsaoEnabled(!ssaoEnabled)}
@@ -44,7 +44,7 @@ export function TourBottomBar({
         aria-label={ssaoEnabled ? "Desactivar Postprocessing" : "Activar Postprocessing"}
       >
         {ssaoEnabled ? "Postprocessing ON" : "Postprocessing OFF"}
-      </button>
+      </button> */}
     </div>
   );
 }

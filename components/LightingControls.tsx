@@ -38,7 +38,7 @@ export function LightingControls({
   embedded = false,
 }: LightingControlsProps) {
   const [preset, setPreset] = useState<string>("Dusk");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const hourMinRef = useRef<HTMLSpanElement>(null);
   const ampmRef = useRef<HTMLSpanElement>(null);
@@ -139,7 +139,8 @@ export function LightingControls({
           paddingRight: 4,
         }}
       >
-        <div style={{ display: "flex", alignItems: "baseline" }}>
+        {/* HORA */}
+        {/* <div style={{ display: "flex", alignItems: "baseline" }}>
           <span
             ref={hourMinRef}
             style={{
@@ -165,10 +166,10 @@ export function LightingControls({
           >
             {timeToDisplay(timeOfDay).ampm}
           </span>
-        </div>
+        </div> */}
 
         {/* Preset dropdown "Brunch" pegado a la hora */}
-        <div style={{ position: "relative" }} onClick={(e) => e.stopPropagation()}>
+        {/* <div style={{ position: "relative" }} onClick={(e) => e.stopPropagation()}>
           <button
             type="button"
             onClick={() => setDropdownOpen((o) => !o)}
@@ -233,7 +234,7 @@ export function LightingControls({
             ))}
           </ul>
         )}
-        </div>
+        </div> */}
       </div>
 
       {/* TIME OF DAY slider with gradient track */}
@@ -378,7 +379,7 @@ export function LightingControls({
       </div>
 
       {/* Close button */}
-      <button
+      {/* <button
         type="button"
         onClick={() => setOpen(false)}
         aria-label="Cerrar panel"
@@ -398,7 +399,7 @@ export function LightingControls({
         }}
       >
         ✕
-      </button>
+      </button> */}
     </div>
   );
 }

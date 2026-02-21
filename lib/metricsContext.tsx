@@ -16,7 +16,7 @@ const MetricsContext = createContext<MetricsContextValue | null>(null);
 export function MetricsProvider({ children }: { children: React.ReactNode }) {
   const [fps, setFps] = useState(0);
   const [freeCamera, setFreeCamera] = useState(false);
-  const [ssaoEnabled, setSsaoEnabled] = useState(false);
+  const [ssaoEnabled, setSsaoEnabled] = useState(true);
   const setFreeCameraStable = useCallback((v: boolean) => setFreeCamera(v), []);
   const setSsaoEnabledStable = useCallback((v: boolean) => setSsaoEnabled(v), []);
   const value: MetricsContextValue = {

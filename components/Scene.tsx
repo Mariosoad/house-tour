@@ -44,7 +44,7 @@ function PostEffects() {
       <SSAOEffect
         radius={0.05}
         intensity={1.7}
-        rangeFalloff={0.5}
+        rangeFalloff={0.6}
         bias={0.03}
         samples={32}
         rings={4}
