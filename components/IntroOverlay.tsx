@@ -29,8 +29,11 @@ export function IntroOverlay({ onStart, loadingPage = true, className = "" }: In
     >
       <div className="intro-overlay__backdrop" aria-hidden="true" />
       <div className="intro-overlay__content">
-        <p className="intro-overlay__subtitle">THREEJS SSGI <br/> & <br/> N8A0</p>
-        <p className="intro-overlay__subtitle_author">By Mario Hinotroza & Rodrigo Isasmendi</p>
+        <div>
+          <p className="intro-overlay__subtitle">THREEJS SSGI <br/> & <br/> N8A0</p>
+          <br/> 
+          <p className="intro-overlay__subtitle_author">By Mario Hinotroza & Rodrigo Isasmendi</p>
+        </div>
         {loadingPage ? (
           <div className="intro-overlay__loading" aria-live="polite" aria-label="Cargando">
             <div className="intro-overlay__loading-spinner" aria-hidden="true" />
