@@ -82,6 +82,25 @@ body {
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
 
+
+@media (max-width: 768px) {
+  .tour-ui__brand {
+    top: 1.6rem;
+    left: 35px;
+  }
+  .tour-ui__brand-img {
+    height: 32px;
+    width: 75px;
+  }
+
+  .lighting-controls{
+    max-width: 95vw !important;
+    min-width: 95vw !important;
+    width: 100% !important;
+    padding: 12px 10px 12px !important;
+    bottom: 10px !important;
+  }
+}
 /* FPS + metrics - top right */
 .metrics-overlay {
   position: absolute;
@@ -444,7 +463,6 @@ body {
   .intro-overlay__subtitle {
     font-size: 2rem;
   }
-  
   .intro-overlay__subtitle_author {
     font-size: 0.75rem;
   }

@@ -10,14 +10,18 @@ interface IntroOverlayProps {
 
 export function IntroOverlay({ onStart, loadingPage = true, className = "" }: IntroOverlayProps) {
   useEffect(() => {
-    const handleWheel = () => {
+    const start = () => {
       onStart();
       cleanup();
     };
     const cleanup = () => {
-      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("wheel", start);
+      window.removeEventListener("touchstart", start);
+      window.removeEventListener("touchmove", start);
     };
-    window.addEventListener("wheel", handleWheel);
+    window.addEventListener("wheel", start);
+    window.addEventListener("touchstart", start);
+    window.addEventListener("touchmove", start);
     return cleanup;
   }, [onStart]);
 
