@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/immutability */
 import type { TextureDataType, Group, Camera, Scene } from 'three'
 import { HalfFloatType, NoToneMapping } from 'three'
@@ -135,47 +136,43 @@ export const EffectComposer = /* @__PURE__ */ memo(
       }, [composer])
 
       const group = useRef<Group>(null!)
-      useLayoutEffect(() => {  
+      useLayoutEffect(() => {
         if (!composer || !gl.getContext()) return
-
+      
         const passes: Pass[] = []
-
-        // TODO: rewrite all of this with R3F v9
-        const groupInstance = (group.current as Group & { __r3f: Instance<Group> }).__r3f
-
-        if (groupInstance && composer) {
-          const children = groupInstance.children
-
-          for (let i = 0; i < children.length; i++) {
-            const child = children[i].object
-
-            if (child instanceof Effect) {
-              const effects: Effect[] = [child]
-
-              if (!isConvolution(child)) {
-                let next: unknown = null
-                while ((next = children[i + 1]?.object) instanceof Effect) {
-                  if (isConvolution(next)) break
-                  effects.push(next)
-                  i++
-                }
+        const groupInstance = (group.current as any)?.__r3f
+        if (!groupInstance) return
+      
+        const children = groupInstance.children
+      
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i].object
+      
+          if (child instanceof Effect) {
+            const effects: Effect[] = [child]
+      
+            if (!isConvolution(child)) {
+              let next: unknown = null
+              while ((next = children[i + 1]?.object) instanceof Effect) {
+                if (isConvolution(next)) break
+                effects.push(next)
+                i++
               }
-
-              const pass = new EffectPass(camera, ...effects)
-              passes.push(pass)
-            } else if (child instanceof Pass) {
-              passes.push(child)
             }
+      
+            passes.push(new EffectPass(camera, ...effects))
+          } else if (child instanceof Pass) {
+            passes.push(child)
           }
-
-          for (const pass of passes) composer?.addPass(pass)
-
-          if (normalPass) normalPass.enabled = true
-          if (downSamplingPass) downSamplingPass.enabled = true
         }
-
+      
+        passes.forEach((p) => composer.addPass(p))
+      
+        if (normalPass) normalPass.enabled = true
+        if (downSamplingPass) downSamplingPass.enabled = true
+      
         return () => {
-          for (const pass of passes) composer?.removePass(pass)
+          passes.forEach((p) => composer.removePass(p))
           if (normalPass) normalPass.enabled = false
           if (downSamplingPass) downSamplingPass.enabled = false
         }
