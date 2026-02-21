@@ -128,8 +128,16 @@ export const EffectComposer = /* @__PURE__ */ memo(
         enabled ? renderPriority : 0
       )
 
+      useEffect(() => {
+        return () => {
+          composer?.dispose()
+        }
+      }, [composer])
+
       const group = useRef<Group>(null!)
-      useLayoutEffect(() => {
+      useLayoutEffect(() => {  
+        if (!composer || !gl.getContext()) return
+
         const passes: Pass[] = []
 
         // TODO: rewrite all of this with R3F v9
