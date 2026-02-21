@@ -47,7 +47,7 @@ function TourExperienceInner({
   const { addDelta } = useTourScroll();
   const { freeCamera } = useMetrics();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [timeOfDay, setTimeOfDay] = useState(0.849);  // 4:53 PM
+  const [timeOfDay, setTimeOfDay] = useState(1.0);  // 4:53 PM
   const [sunRotation, setSunRotation] = useState(30);
   const onTimeOfDayChange = useCallback((v: number) => setTimeOfDay(v), []);
   const onSunRotationChange = useCallback((v: number) => setSunRotation(v), []);
