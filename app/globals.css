@@ -461,10 +461,10 @@ body {
 }
 @media (max-width: 768px) {
   .intro-overlay__subtitle {
-    font-size: 2rem;
+    font-size: 2rem !important;
   }
   .intro-overlay__subtitle_author {
-    font-size: 0.75rem;
+    font-size: 0.7rem !important;
   }
 }
 .intro-overlay__subtitle_author{
