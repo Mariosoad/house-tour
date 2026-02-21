@@ -101,16 +101,16 @@ function TourExperienceInner({
             <ScrollTour />
             <CameraDebugUpdater />
             <CameraController />
-            <FPSReporter />
+            {/* <FPSReporter /> */}
           </Suspense>
         </Canvas>
 
         {hasStarted && (
           <>
             <div className="tour-ui__brand">
-              <Image src="/logo-gemdam.png" alt="Gemdam" width={140} height={36} className="tour-ui__brand-img" />
+              <Image src="/logo-gemdam.png" alt="Gemdam" width={200} height={100} className="tour-ui__brand-img" />
             </div>
-            <MetricsOverlay />
+            {/* <MetricsOverlay /> */}
             <WaypointsUI />
             {/* <TourDebugOverlay /> */}
             <TourBottomBar

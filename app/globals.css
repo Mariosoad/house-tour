@@ -68,16 +68,15 @@ body {
 /* Brand logo - top center */
 .tour-ui__brand {
   position: absolute;
-  top: 1rem;
-  left: 50%;
+  top: 2rem;
+  left: 52px;
   transform: translateX(-50%);
   z-index: 10;
   pointer-events: none;
 }
 .tour-ui__brand-img {
-  height: 36px;
-  width: auto;
-  max-width: 160px;
+  height: 48px;
+  width: 100px;
   object-fit: contain;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
