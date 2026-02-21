@@ -136,7 +136,7 @@ export const EffectComposer = /* @__PURE__ */ memo(
           composer?.dispose()
         }
       }, [composer])
-
+      
       const group = useRef<Group>(null!)
       useEffect(() => {
         if (!composer || !gl.getContext()) return
