@@ -75,8 +75,8 @@ body {
   pointer-events: none;
 }
 .tour-ui__brand-img {
-  height: 48px;
-  width: 100px;
+  height: 40px;
+  width: 95px;
   object-fit: contain;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
@@ -399,7 +399,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12.5rem;
+  gap: 8.5rem;
   text-align: center;
   padding: 2rem;
 }
@@ -425,11 +425,18 @@ body {
 .intro-overlay__subtitle {
   margin: 0;
   color: rgba(255, 255, 255, 0.85);
-  font-size: 4.5rem;
+  font-size: 4rem;
   font-weight: 600;
-  line-height: 1.4em;
+  line-height: 1.2em;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  text-shadow: 2px 5px 10px #0000009f;
+}
+.intro-overlay__subtitle_author{
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  font-style: italic;
+  letter-spacing: 0.1em;
   text-shadow: 2px 5px 10px #0000009f;
 }
 .intro-overlay__btn {

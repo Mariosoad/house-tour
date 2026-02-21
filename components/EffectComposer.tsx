@@ -1,3 +1,5 @@
+'use client'
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/immutability */
 import type { TextureDataType, Group, Camera, Scene } from 'three'
