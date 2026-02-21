@@ -140,6 +140,7 @@ export const EffectComposer = /* @__PURE__ */ memo(
       const group = useRef<Group>(null!)
       useEffect(() => {
         if (!composer || !gl.getContext()) return
+        
       
         const passes: Pass[] = []
         const groupInstance = (group.current as any)?.__r3f
@@ -150,7 +151,11 @@ export const EffectComposer = /* @__PURE__ */ memo(
         for (let i = 0; i < children.length; i++) {
           const child = children[i].object
       
-          if (child instanceof Effect) {
+          if (
+            child instanceof Effect &&
+            child.blendMode &&
+            child.blendMode.opacity
+          ) {
             const effects: Effect[] = [child]
       
             if (!isConvolution(child)) {
