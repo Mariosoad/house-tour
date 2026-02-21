@@ -379,7 +379,7 @@ export function LightingControls({
       </div>
 
       {/* Close button */}
-      {/* <button
+      <button
         type="button"
         onClick={() => setOpen(false)}
         aria-label="Cerrar panel"
@@ -399,7 +399,7 @@ export function LightingControls({
         }}
       >
         ✕
-      </button> */}
+      </button>
     </div>
   );
 }

@@ -39,6 +39,7 @@ body {
   height: 100%;
   overflow: hidden;
   position: relative;
+  touch-action: none; /* Let our touch handler control vertical scroll on mobile */
 }
 
 /* Unified tour UI style (glass panel + buttons) */
@@ -403,6 +404,13 @@ body {
   text-align: center;
   padding: 2rem;
 }
+
+@media (max-width: 768px) {
+  .intro-overlay__content {
+    gap: 6rem;
+  }
+}
+
 .intro-overlay__logo_tour {
   position: absolute;
   top: 1rem;
@@ -431,6 +439,15 @@ body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   text-shadow: 2px 5px 10px #0000009f;
+}
+@media (max-width: 768px) {
+  .intro-overlay__subtitle {
+    font-size: 2rem;
+  }
+  
+  .intro-overlay__subtitle_author {
+    font-size: 0.75rem;
+  }
 }
 .intro-overlay__subtitle_author{
   font-size: 0.9rem;
