@@ -132,9 +132,7 @@ export const EffectComposer = /* @__PURE__ */ memo(
       )
 
       useEffect(() => {
-        return () => {
-          composer?.dispose()
-        }
+        return () => composer?.dispose()
       }, [composer])
       
       const group = useRef<Group>(null!)
