@@ -138,7 +138,7 @@ export const EffectComposer = /* @__PURE__ */ memo(
       }, [composer])
 
       const group = useRef<Group>(null!)
-      useLayoutEffect(() => {
+      useEffect(() => {
         if (!composer || !gl.getContext()) return
       
         const passes: Pass[] = []
