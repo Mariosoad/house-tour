@@ -36,7 +36,7 @@ export function IntroOverlay({ onStart, loadingPage = true, className = "" }: In
         <div>
           <p className="intro-overlay__subtitle">THREEJS SSGI <br/> & <br/> N8A0</p>
           <br/> 
-          <p className="intro-overlay__subtitle_author">By Mario Hinotroza & Rodrigo Isasmendi</p>
+          <p className="intro-overlay__subtitle_author">By Mario Hinostroza & Rodrigo Isasmendi</p>
         </div>
         {loadingPage ? (
           <div className="intro-overlay__loading" aria-live="polite" aria-label="Cargando">
