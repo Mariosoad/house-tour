@@ -5,6 +5,7 @@ import { useCallback, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { MeshReflectorMaterial } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
+import { useMetrics } from "@/lib/metricsContext";
 
 type MirrorReplicaProps = {
   sourceMesh: THREE.Mesh;
@@ -17,11 +18,6 @@ type MirrorReplicaProps = {
   offsetZ?: number;
 };
 
-/**
- * Create a plane geometry matching the mirror's front face.
- * MeshReflectorMaterial requires a flat plane; box geometry causes half-black/wrong reflections.
- * Uses geometry bounding box (local) for size; mesh matrix handles position/rotation.
- */
 function createMirrorPlaneGeometry(mesh: THREE.Mesh): THREE.PlaneGeometry | null {
   const geom = mesh.geometry;
   if (!geom) return null;
@@ -94,9 +90,11 @@ export function MirrorReplica({ sourceMesh, parentGroupRef, rotationX, rotationY
   });
 
   const geometry = useMemo(() => createMirrorPlaneGeometry(sourceMesh), [sourceMesh]);
+  const { performanceTier } = useMetrics();
+  const reflectorResolution = performanceTier === "low" ? 1024 : 4096;
   const setRef = useCallback((node: THREE.Mesh | null) => {
     (meshRef as MutableRefObject<THREE.Mesh | null>).current = node;
-    if (node) node.userData.cannotReceiveAO = true; // Excluir del N8AO para evitar oscurecimiento
+    if (node) node.userData.cannotReceiveAO = true; // Excluir del SSAO para evitar oscurecimiento
   }, []);
   if (!geometry) return null;
 
@@ -108,7 +106,7 @@ export function MirrorReplica({ sourceMesh, parentGroupRef, rotationX, rotationY
         emissiveIntensity={0}
         mixContrast={1}
         blur={[0, 0]}
-        resolution={2048}
+        resolution={reflectorResolution}
         mixBlur={0}
         mixStrength={1}
         mirror={1}

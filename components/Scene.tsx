@@ -11,6 +11,8 @@ import { House } from "./House";
 import {
   ToneMappingEffect,
   ToneMappingMode,
+  SMAAEffect,
+  SMAAPreset,
 } from "postprocessing";
 import { SSAO as SSAOEffect } from "./effects/SSAO";
 
@@ -36,19 +38,30 @@ function ToneMappingEffectPrimitive() {
   return <primitive object={instance} dispose={null} />;
 }
 
-function PostEffects() {
+/** SMAA: preset HIGH en ultra para AA máximo, preset MEDIUM en low */
+function SMAAEffectPrimitive({ performanceTier }: { performanceTier: "low" | "ultra" }) {
+  const instance = useMemo(
+    () => new SMAAEffect({ preset: performanceTier === "ultra" ? SMAAPreset.HIGH : SMAAPreset.MEDIUM }),
+    [performanceTier]
+  );
+  return <primitive object={instance} dispose={null} />;
+}
+
+function PostEffects({ performanceTier }: { performanceTier: "low" | "ultra" }) {
   const needsNormalPass = ACTIVE_POST_EFFECT === "ssao";
+  const ssaoSamples = performanceTier === "low" ? 24 : 48;
+  const ssaoRings = performanceTier === "ultra" ? 5 : 4;
 
   const activeEffect =
     ACTIVE_POST_EFFECT === "ssao" && (
       <SSAOEffect
-        radius={0.05}
-        intensity={1.7}
+        radius={0.15}
+        intensity={performanceTier === "ultra" ? 1.2 : 1.0}
         rangeFalloff={0.6}
-        bias={0.03}
-        samples={32}
-        rings={4}
-        luminanceInfluence={0.5}
+        bias={0.04}
+        samples={ssaoSamples}
+        rings={ssaoRings}
+        luminanceInfluence={0.6}
       />
     )
 
@@ -56,6 +69,7 @@ function PostEffects() {
     <EffectComposer enableNormalPass={needsNormalPass} multisampling={0}>
       {activeEffect as React.ReactElement}
       <ToneMappingEffectPrimitive />
+      <SMAAEffectPrimitive performanceTier={performanceTier} />
       <OutputPass />
     </EffectComposer>
   );
@@ -81,7 +95,7 @@ export function Scene({
   sunRotation = 0,
 }: SceneProps) {
   const houseGroupRef = useRef<THREE.Group>(null);
-  const { ssaoEnabled } = useMetrics();
+  const { ssaoEnabled, performanceTier } = useMetrics();
 
   useLayoutEffect(() => {
     const g = houseGroupRef.current;
@@ -119,12 +133,12 @@ export function Scene({
 
   return (
     <>
-      <Light_Environment timeOfDay={timeOfDay} sunRotation={sunRotation} />
+      <Light_Environment timeOfDay={timeOfDay} sunRotation={sunRotation} performanceTier={performanceTier} />
       <group ref={houseGroupRef}>
         <House parentGroupRef={houseGroupRef} />
       </group>
 
-      {ssaoEnabled && <PostEffects />}
+      {ssaoEnabled && <PostEffects performanceTier={performanceTier} />}
     </>
   );
 }

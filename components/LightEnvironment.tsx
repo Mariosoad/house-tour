@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 import { Environment } from "@react-three/drei";
+import type { PerformanceTier } from "@/lib/metricsContext";
 
 function sunPosition(timeOfDay: number, sunRotationDeg: number): THREE.Vector3 {
   const hour = 5 + timeOfDay * 14;
@@ -35,9 +36,10 @@ function sunColorAndIntensity(timeOfDay: number): { color: THREE.Color; intensit
 export type LightEnvironmentProps = {
   timeOfDay?: number;
   sunRotation?: number;
+  performanceTier?: PerformanceTier;
 };
 
-export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0 }: LightEnvironmentProps) {
+export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0, performanceTier = "ultra" }: LightEnvironmentProps) {
   const lightTarget = useMemo(() => {
     const t = new THREE.Object3D();
     t.position.set(0, 0, 0);
@@ -56,7 +58,7 @@ export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0 }: LightEnv
         intensity={intensity}
         color={color}
         castShadow
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={performanceTier === "low" ? [2048, 2048] : [4096, 4096]}
         shadow-camera-near={1}
         shadow-camera-far={40}
         shadow-camera-top={6}

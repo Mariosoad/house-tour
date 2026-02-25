@@ -19,7 +19,6 @@ import { FullscreenButton } from "@/components/FullscreenButton";
 import { TourDebugProvider } from "@/lib/tourDebugContext";
 import { IntroOverlay } from "@/components/IntroOverlay";
 import { LoadedReporter } from "@/components/LoadedReporter";
-import { TourDebugOverlay } from "@/components/TourDebugOverlay";
 
 function FallbackContent() {
   return (
@@ -46,7 +45,7 @@ function TourExperienceInner({
   onLoadingComplete?: () => void;
 }) {
   const { addDelta } = useTourScroll();
-  const { freeCamera } = useMetrics();
+  const { freeCamera, performanceTier } = useMetrics();
   const containerRef = useRef<HTMLDivElement>(null);
   const [timeOfDay, setTimeOfDay] = useState(1.0);  // 4:53 PM
   const [sunRotation, setSunRotation] = useState(30);
@@ -92,7 +91,7 @@ function TourExperienceInner({
       >
         <Canvas
           shadows
-          dpr={[1, 2]}
+          dpr={performanceTier === "low" ? [1, 1.5] : [1, Math.min(2, typeof window !== "undefined" ? window.devicePixelRatio : 2)]}
           gl={{
             antialias: true,
             toneMapping: THREE.ACESFilmicToneMapping,
@@ -119,7 +118,7 @@ function TourExperienceInner({
             <ScrollTour />
             <CameraDebugUpdater />
             <CameraController />
-            {/* <FPSReporter /> */}
+            <FPSReporter />
           </Suspense>
         </Canvas>
 
@@ -129,9 +128,8 @@ function TourExperienceInner({
               <Image src="/logo-gemdam.png" alt="Gemdam" width={200} height={100} className="tour-ui__brand-img" />
             </div>
             <FullscreenButton />
-            {/* <MetricsOverlay /> */}
+            <MetricsOverlay />
             <WaypointsUI />
-            {/* <TourDebugOverlay /> */}
             <TourBottomBar
               timeOfDay={timeOfDay}
               sunRotation={sunRotation}
