@@ -66,7 +66,10 @@ function PostEffects({ performanceTier }: { performanceTier: "low" | "ultra" }) 
     )
 
   return (
-    <EffectComposer enableNormalPass={needsNormalPass} multisampling={0}>
+    <EffectComposer
+      enableNormalPass={needsNormalPass}
+      multisampling={performanceTier === "ultra" ? 8 : 4}
+    >
       {activeEffect as React.ReactElement}
       <ToneMappingEffectPrimitive />
       <SMAAEffectPrimitive performanceTier={performanceTier} />
