@@ -55,8 +55,8 @@ function PostEffects({ performanceTier }: { performanceTier: "low" | "ultra" }) 
   const activeEffect =
     ACTIVE_POST_EFFECT === "ssao" && (
       <SSAOEffect
-        radius={0.15}
-        intensity={performanceTier === "ultra" ? 1.2 : 1.0}
+        radius={0.10}
+        intensity={performanceTier === "ultra" ? 1.8 : 1.0}
         rangeFalloff={0.6}
         bias={0.04}
         samples={ssaoSamples}
