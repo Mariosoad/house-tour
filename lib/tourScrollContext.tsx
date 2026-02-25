@@ -17,6 +17,8 @@ export type TourScrollContextValue = {
   progressRef: React.MutableRefObject<number>;
   /** Ref for target progress. */
   targetProgressRef: React.MutableRefObject<number | null>;
+  /** Ref con el t suavizado de la cámara (0..1), actualizado cada frame. Para sincronizar luz con cámara. */
+  cameraTRef: React.MutableRefObject<number>;
 };
 
 const TourScrollContext = createContext<TourScrollContextValue | null>(null);
@@ -26,6 +28,7 @@ const SCROLL_SPEED = 0.0004;
 export function TourScrollProvider({ children }: { children: React.ReactNode }) {
   const progressRef = useRef(0);
   const targetProgressRef = useRef<number | null>(null);
+  const cameraTRef = useRef(0);
   const [progress, setProgressState] = useState(0);
   const [targetProgress, setTargetProgressState] = useState<number | null>(null);
 
@@ -56,6 +59,7 @@ export function TourScrollProvider({ children }: { children: React.ReactNode }) 
     setProgress,
     progressRef,
     targetProgressRef,
+    cameraTRef,
   };
 
   return (

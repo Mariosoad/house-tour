@@ -9,6 +9,9 @@ export type LightingControlsProps = {
   onSunRotationChange: (v: number) => void;
   /** When true, the collapsed button renders inline (no position fixed) for use in a bottom bar */
   embedded?: boolean;
+  /** When true, lighting is manually overridden; show "Auto" button to sync with tour */
+  lightingOverride?: boolean;
+  onSyncWithTour?: () => void;
 };
 
 const PRESETS: { label: string; time: number; rotation: number }[] = [
@@ -36,6 +39,8 @@ export function LightingControls({
   onTimeOfDayChange,
   onSunRotationChange,
   embedded = false,
+  lightingOverride = false,
+  onSyncWithTour,
 }: LightingControlsProps) {
   const [preset, setPreset] = useState<string>("Dusk");
   const [open, setOpen] = useState(true);
@@ -248,7 +253,7 @@ export function LightingControls({
             marginBottom: 6,
           }}
         >
-          TIME OF DAY
+          TIME OF DAY = {timeOfDay.toFixed(2)}
         </div>
         <div className="lighting-slider-wrap">
           <div
@@ -319,7 +324,7 @@ export function LightingControls({
             marginBottom: 6,
           }}
         >
-          SUN ROTATION
+          SUN ROTATION = {sunRotation.toFixed(2)}
         </div>
         <div className="lighting-slider-wrap">
           <div
@@ -377,6 +382,30 @@ export function LightingControls({
           ))}
         </div>
       </div>
+
+      {/* Sync con tour: visible solo cuando hay override manual */}
+      {lightingOverride && onSyncWithTour && (
+        <button
+          type="button"
+          onClick={onSyncWithTour}
+          aria-label="Sincronizar luz con el recorrido"
+          title="Sincronizar con recorrido"
+          style={{
+            padding: "8px 14px",
+            borderRadius: 12,
+            border: "1px solid rgba(255,255,255,0.15)",
+            background: "rgba(0,0,0,0.25)",
+            color: "rgba(255,255,255,0.9)",
+            fontSize: 12,
+            fontWeight: 500,
+            cursor: "pointer",
+            fontFamily: "inherit",
+            flexShrink: 0,
+          }}
+        >
+          Auto
+        </button>
+      )}
 
       {/* Close button */}
       <button

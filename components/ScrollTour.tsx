@@ -14,7 +14,7 @@ const JUMP_EASE_SPEED = 0.8;
 
 export function ScrollTour() {
   const { camera } = useThree();
-  const { progressRef, targetProgressRef, setProgress } = useTourScroll();
+  const { progressRef, targetProgressRef, setProgress, cameraTRef } = useTourScroll();
   const { freeCamera } = useMetrics();
 
   const positionCurve = useMemo(() => getPositionCurve(), []);
@@ -73,6 +73,8 @@ export function ScrollTour() {
 
     positionCurve.getPointAt(t, currentPosition.current);
     targetCurve.getPointAt(t, currentTarget.current);
+
+    cameraTRef.current = t;
 
     camera.position.lerp(currentPosition.current, 1 - Math.exp(-DAMPING * delta));
     const lookAtTarget = currentTarget.current.clone();

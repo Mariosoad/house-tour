@@ -8,6 +8,8 @@ export type TourBottomBarProps = {
   sunRotation: number;
   onTimeOfDayChange: (v: number) => void;
   onSunRotationChange: (v: number) => void;
+  lightingOverride?: boolean;
+  onSyncWithTour?: () => void;
 };
 
 export function TourBottomBar({
@@ -15,6 +17,8 @@ export function TourBottomBar({
   sunRotation,
   onTimeOfDayChange,
   onSunRotationChange,
+  lightingOverride = false,
+  onSyncWithTour,
 }: TourBottomBarProps) {
   const { ssaoEnabled, setSsaoEnabled, freeCamera, setFreeCamera } = useMetrics();
 
@@ -34,6 +38,8 @@ export function TourBottomBar({
         sunRotation={sunRotation}
         onTimeOfDayChange={onTimeOfDayChange}
         onSunRotationChange={onSunRotationChange}
+        lightingOverride={lightingOverride}
+        onSyncWithTour={onSyncWithTour}
         embedded
       />
       {/* <button

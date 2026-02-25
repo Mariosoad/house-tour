@@ -6,9 +6,11 @@ import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { KeyboardControls } from "@react-three/drei";
 import { TourScrollProvider, useTourScroll } from "@/lib/tourScrollContext";
+import { LightingProvider, useLighting } from "@/lib/lightingContext";
 import { MetricsProvider, useMetrics } from "@/lib/metricsContext";
 import { Scene } from "@/components/Scene";
 import { ScrollTour } from "@/components/ScrollTour";
+import { LightingSync } from "@/components/LightingSync";
 import { CameraDebugUpdater } from "@/components/CameraDebugUpdater";
 import { CameraController } from "@/components/CameraController";
 import { FPSReporter } from "@/components/FPSReporter";
@@ -46,11 +48,11 @@ function TourExperienceInner({
 }) {
   const { addDelta } = useTourScroll();
   const { freeCamera, performanceTier } = useMetrics();
+  const { timeOfDay, sunRotation, manualTimeOfDay, manualSunRotation, onTimeOfDayChange, onSunRotationChange, lightingOverride, setLightingOverride } = useLighting();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [timeOfDay, setTimeOfDay] = useState(1.0);  // 4:53 PM
-  const [sunRotation, setSunRotation] = useState(30);
-  const onTimeOfDayChange = useCallback((v: number) => setTimeOfDay(v), []);
-  const onSunRotationChange = useCallback((v: number) => setSunRotation(v), []);
+
+  const effectiveTimeOfDay = freeCamera ? manualTimeOfDay : timeOfDay;
+  const effectiveSunRotation = freeCamera ? manualSunRotation : sunRotation;
 
   useEffect(() => {
     if (freeCamera) return;
@@ -110,12 +112,13 @@ function TourExperienceInner({
           <Suspense fallback={<FallbackContent />}>
             {onLoadingComplete && <LoadedReporter onLoaded={onLoadingComplete} />}
             <Scene
-              timeOfDay={timeOfDay}
-              sunRotation={sunRotation}
+              timeOfDay={effectiveTimeOfDay}
+              sunRotation={effectiveSunRotation}
               webgpu={false}
               contactShadows={sceneContactShadows}
             />
             <ScrollTour />
+            <LightingSync />
             <CameraDebugUpdater />
             <CameraController />
             <FPSReporter />
@@ -131,10 +134,12 @@ function TourExperienceInner({
             <MetricsOverlay />
             <WaypointsUI />
             <TourBottomBar
-              timeOfDay={timeOfDay}
-              sunRotation={sunRotation}
+              timeOfDay={effectiveTimeOfDay}
+              sunRotation={effectiveSunRotation}
               onTimeOfDayChange={onTimeOfDayChange}
               onSunRotationChange={onSunRotationChange}
+              lightingOverride={lightingOverride}
+              onSyncWithTour={() => setLightingOverride(false)}
             />
           </>
         )}
@@ -161,15 +166,17 @@ function ExperienceWithIntro() {
 
   return (
     <div style={{ width: "100%", height: "100vh", position: "relative" }}>
-      <TourExperienceInner
-        hasStarted={!showIntro}
-        onLoadingComplete={handleLoadingComplete}
-      />
-      <IntroOverlay
-        onStart={handleStartExperience}
-        loadingPage={loadingPage}
-        className={showIntro ? "" : "is-hidden"}
-      />
+      <LightingProvider>
+        <TourExperienceInner
+          hasStarted={!showIntro}
+          onLoadingComplete={handleLoadingComplete}
+        />
+        <IntroOverlay
+          onStart={handleStartExperience}
+          loadingPage={loadingPage}
+          className={showIntro ? "" : "is-hidden"}
+        />
+      </LightingProvider>
     </div>
   );
 }
