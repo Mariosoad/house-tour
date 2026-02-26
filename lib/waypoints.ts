@@ -30,14 +30,14 @@ export type Waypoint = {
 
 /** 8 waypoints en loop según vistas del recorrido guiado */
 export const WAYPOINTS: Waypoint[] = [
-  { id: "wp1", label: "1", t: 0, timeOfDay: 1.0, sunRotation: 3.60 },
-  { id: "wp2", label: "2", t: 0.125, timeOfDay: 1.0, sunRotation: 3.40 },
-  { id: "wp3", label: "3", t: 0.25, timeOfDay: 1.0, sunRotation: 3.40 },
-  { id: "wp4", label: "4", t: 0.375, timeOfDay: 1.0, sunRotation: 3.40 },
-  { id: "wp5", label: "5", t: 0.5, timeOfDay: 1.0, sunRotation: 2.57 },
-  { id: "wp6", label: "6", t: 0.625, timeOfDay: 1.0, sunRotation: 2.20 },
-  { id: "wp7", label: "7", t: 0.75, timeOfDay: 1.0, sunRotation: 2.20 },
-  { id: "wp8", label: "8", t: 0.875, timeOfDay: 1.0, sunRotation: 3.0 },
+  { id: "wp1", label: "1", t: 0, timeOfDay: 1.0, sunRotation: 360.0 },
+  { id: "wp2", label: "2", t: 0.125, timeOfDay: 1.0, sunRotation: 340.0 },
+  { id: "wp3", label: "3", t: 0.25, timeOfDay: 1.0, sunRotation: 340.0 },
+  { id: "wp4", label: "4", t: 0.375, timeOfDay: 1.0, sunRotation: 340.0 },
+  { id: "wp5", label: "5", t: 0.5, timeOfDay: 1.0, sunRotation: 257.0 },
+  { id: "wp6", label: "6", t: 0.625, timeOfDay: 1.0, sunRotation: 220.0 },
+  { id: "wp7", label: "7", t: 0.75, timeOfDay: 1.0, sunRotation: 220.0 },
+  { id: "wp8", label: "8", t: 0.875, timeOfDay: 1.0, sunRotation: 300.0 },
 ];
 
 /** Interpola timeOfDay y sunRotation según el progress 0–1 del tour */
