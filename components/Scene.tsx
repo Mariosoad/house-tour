@@ -4,7 +4,7 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { EffectComposer } from "./EffectComposer";
-import { useMetrics } from "@/lib/metricsContext";
+import { useMetrics, type EffectiveTier } from "@/lib/metricsContext";
 import { Light_Environment } from "./LightEnvironment";
 import { House } from "./House";
 
@@ -38,25 +38,27 @@ function ToneMappingEffectPrimitive() {
   return <primitive object={instance} dispose={null} />;
 }
 
-/** SMAA: preset HIGH en ultra para AA máximo, preset MEDIUM en low */
-function SMAAEffectPrimitive({ performanceTier }: { performanceTier: "low" | "ultra" }) {
+/** SMAA: HIGH en ultra/medium, MEDIUM en low */
+function SMAAEffectPrimitive({ effectiveTier }: { effectiveTier: EffectiveTier }) {
   const instance = useMemo(
-    () => new SMAAEffect({ preset: performanceTier === "ultra" ? SMAAPreset.HIGH : SMAAPreset.MEDIUM }),
-    [performanceTier]
+    () => new SMAAEffect({ preset: effectiveTier === "low" ? SMAAPreset.MEDIUM : SMAAPreset.HIGH }),
+    [effectiveTier]
   );
   return <primitive object={instance} dispose={null} />;
 }
 
-function PostEffects({ performanceTier }: { performanceTier: "low" | "ultra" }) {
+function PostEffects({ effectiveTier }: { effectiveTier: EffectiveTier }) {
   const needsNormalPass = ACTIVE_POST_EFFECT === "ssao";
-  const ssaoSamples = performanceTier === "low" ? 24 : 48;
-  const ssaoRings = performanceTier === "ultra" ? 5 : 4;
+  const ssaoSamples = effectiveTier === "low" ? 24 : effectiveTier === "medium" ? 36 : 48;
+  const ssaoRings = effectiveTier === "ultra" ? 5 : 4;
+  const ssaoIntensity = effectiveTier === "ultra" ? 1.8 : effectiveTier === "medium" ? 1.4 : 1.0;
+  const multisampling = effectiveTier === "low" ? 4 : effectiveTier === "medium" ? 6 : 8;
 
   const activeEffect =
     ACTIVE_POST_EFFECT === "ssao" && (
       <SSAOEffect
-        radius={0.10}
-        intensity={performanceTier === "ultra" ? 1.8 : 1.0}
+        radius={0.05}
+        intensity={ssaoIntensity}
         rangeFalloff={0.6}
         bias={0.04}
         samples={ssaoSamples}
@@ -68,11 +70,11 @@ function PostEffects({ performanceTier }: { performanceTier: "low" | "ultra" }) 
   return (
     <EffectComposer
       enableNormalPass={needsNormalPass}
-      multisampling={performanceTier === "ultra" ? 8 : 4}
+      multisampling={multisampling}
     >
       {activeEffect as React.ReactElement}
       <ToneMappingEffectPrimitive />
-      <SMAAEffectPrimitive performanceTier={performanceTier} />
+      <SMAAEffectPrimitive effectiveTier={effectiveTier} />
       <OutputPass />
     </EffectComposer>
   );
@@ -98,7 +100,7 @@ export function Scene({
   sunRotation = 0,
 }: SceneProps) {
   const houseGroupRef = useRef<THREE.Group>(null);
-  const { ssaoEnabled, performanceTier } = useMetrics();
+  const { ssaoEnabled, effectiveTier } = useMetrics();
 
   useLayoutEffect(() => {
     const g = houseGroupRef.current;
@@ -136,12 +138,12 @@ export function Scene({
 
   return (
     <>
-      <Light_Environment timeOfDay={timeOfDay} sunRotation={sunRotation} performanceTier={performanceTier} />
+      <Light_Environment timeOfDay={timeOfDay} sunRotation={sunRotation} effectiveTier={effectiveTier} />
       <group ref={houseGroupRef}>
         <House parentGroupRef={houseGroupRef} />
       </group>
 
-      {ssaoEnabled && <PostEffects performanceTier={performanceTier} />}
+      {ssaoEnabled && <PostEffects effectiveTier={effectiveTier} />}
     </>
   );
 }

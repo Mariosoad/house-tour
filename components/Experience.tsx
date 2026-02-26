@@ -47,7 +47,7 @@ function TourExperienceInner({
   onLoadingComplete?: () => void;
 }) {
   const { addDelta } = useTourScroll();
-  const { freeCamera, performanceTier } = useMetrics();
+  const { freeCamera, effectiveTier } = useMetrics();
   const { timeOfDay, sunRotation, manualTimeOfDay, manualSunRotation, onTimeOfDayChange, onSunRotationChange, lightingOverride, setLightingOverride } = useLighting();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -93,7 +93,13 @@ function TourExperienceInner({
       >
         <Canvas
           shadows
-          dpr={performanceTier === "low" ? [1, 1.5] : [1, Math.min(2, typeof window !== "undefined" ? window.devicePixelRatio : 2)]}
+          dpr={
+            effectiveTier === "low"
+              ? [1, 1.5]
+              : effectiveTier === "medium"
+                ? [1, Math.min(1.75, typeof window !== "undefined" ? window.devicePixelRatio : 1.75)]
+                : [1, Math.min(2, typeof window !== "undefined" ? window.devicePixelRatio : 2)]
+          }
           gl={{
             antialias: true,
             toneMapping: THREE.ACESFilmicToneMapping,
