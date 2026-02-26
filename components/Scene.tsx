@@ -50,8 +50,8 @@ function SMAAEffectPrimitive({ effectiveTier }: { effectiveTier: EffectiveTier }
 function PostEffects({ effectiveTier }: { effectiveTier: EffectiveTier }) {
   const needsNormalPass = ACTIVE_POST_EFFECT === "ssao";
   const ssaoSamples = effectiveTier === "low" ? 24 : effectiveTier === "medium" ? 36 : 48;
-  const ssaoRings = effectiveTier === "ultra" ? 5 : 4;
-  const ssaoIntensity = effectiveTier === "ultra" ? 1.8 : effectiveTier === "medium" ? 1.4 : 1.0;
+  const ssaoRings = effectiveTier === "ultra" ? 4 : 3;
+  const ssaoIntensity = effectiveTier === "ultra" ? 2.0 : effectiveTier === "medium" ? 1.4 : 1.0;
   const multisampling = effectiveTier === "low" ? 4 : effectiveTier === "medium" ? 6 : 8;
 
   const activeEffect =
