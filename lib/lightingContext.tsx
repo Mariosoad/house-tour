@@ -37,13 +37,21 @@ export function LightingProvider({ children }: { children: React.ReactNode }) {
 
   const onTimeOfDayChange = useCallback((v: number) => {
     setManualTimeOfDay(v);
+    // Preservar sunRotation actual al cambiar solo time of day
+    if (!lightingOverride) {
+      setManualSunRotation(tourSunRotation);
+    }
     setLightingOverride(true);
-  }, []);
+  }, [lightingOverride, tourSunRotation]);
 
   const onSunRotationChange = useCallback((v: number) => {
     setManualSunRotation(v);
+    // Preservar time of day actual al cambiar solo sun rotation
+    if (!lightingOverride) {
+      setManualTimeOfDay(tourTimeOfDay);
+    }
     setLightingOverride(true);
-  }, []);
+  }, [lightingOverride, tourTimeOfDay]);
 
   const timeOfDay = lightingOverride ? manualTimeOfDay : tourTimeOfDay;
   const sunRotation = lightingOverride ? manualSunRotation : tourSunRotation;
