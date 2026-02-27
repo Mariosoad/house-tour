@@ -43,7 +43,7 @@ export function LightingControls({
   onSyncWithTour,
 }: LightingControlsProps) {
   const [preset, setPreset] = useState<string>("Dusk");
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const hourMinRef = useRef<HTMLSpanElement>(null);
   const ampmRef = useRef<HTMLSpanElement>(null);

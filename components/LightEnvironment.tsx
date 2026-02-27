@@ -75,7 +75,7 @@ export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0, effectiveT
         shadow-normalBias={0.01}
       />
       <Environment
-        files="/pretoria_gardens_2k.hdr"
+        files="/Coast_Palms_HDRI.hdr"
         background
         environmentIntensity={Math.max(0.08, envIntensity)}
         environmentRotation={[0.4, 0, 1.4]}
