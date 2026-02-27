@@ -97,22 +97,47 @@ export function LightingControls({
   };
 
   if (!open) {
-    return (
-      <button
-        type="button"
-        className="tour-ui-btn"
-        onClick={() => setOpen(true)}
-        aria-label="Abrir controles de iluminación"
-        style={embedded ? undefined : {
+    const containerStyle: React.CSSProperties = embedded
+      ? { display: "flex", alignItems: "center", gap: 8 }
+      : {
           position: "fixed",
           bottom: 24,
           left: "50%",
           transform: "translateX(-50%)",
           zIndex: 100,
-        }}
-      >
-        Time of day
-      </button>
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        };
+    return (
+      <div style={containerStyle}>
+        <button
+          type="button"
+          className="tour-ui-btn"
+          onClick={() => setOpen(true)}
+          aria-label="Abrir controles de iluminación"
+        >
+          Time of day
+        </button>
+        {lightingOverride && onSyncWithTour && (
+          <button
+            type="button"
+            className="tour-ui-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSyncWithTour();
+            }}
+            aria-label="Sincronizar luz con el recorrido"
+            title="Las luces volverán a seguir el recorrido al hacer scroll"
+            style={{
+              background: "rgba(255,255,255,0.12)",
+              border: "1px solid rgba(255,255,255,0.2)",
+            }}
+          >
+            Auto
+          </button>
+        )}
+      </div>
     );
   }
 
