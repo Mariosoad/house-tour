@@ -45,6 +45,15 @@ function shadowMapSize(tier: EffectiveTier): [number, number] {
   return [4096, 4096];
 }
 
+/** Convierte la posición del sol en rotación del HDRI para que la iluminación venga de la misma dirección/altura */
+function envRotationFromSun(pos: THREE.Vector3): [number, number, number] {
+  const len = pos.length();
+  if (len < 0.01) return [0.4, 0, 1.4];
+  const azimuth = Math.atan2(pos.x, pos.z);
+  const elevation = Math.asin(pos.y / len);
+  return [elevation, azimuth, 1.4];
+}
+
 export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0, effectiveTier = "ultra" }: LightEnvironmentProps) {
   const lightTarget = useMemo(() => {
     const t = new THREE.Object3D();
@@ -78,7 +87,7 @@ export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0, effectiveT
         files="/Coast_Palms_HDRI.hdr"
         background
         environmentIntensity={Math.max(0.08, envIntensity)}
-        environmentRotation={[0.4, 0, 1.4]}
+        environmentRotation={envRotationFromSun(pos)}
       />
     </>
   );
