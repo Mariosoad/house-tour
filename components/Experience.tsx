@@ -42,12 +42,14 @@ const sceneContactShadows = {
 function TourExperienceInner({
   hasStarted,
   onLoadingComplete,
+  loadingPage,
 }: {
   hasStarted: boolean;
   onLoadingComplete?: () => void;
+  loadingPage: boolean;
 }) {
   const { addDelta } = useTourScroll();
-  const { freeCamera, effectiveTier } = useMetrics();
+  const { freeCamera, effectiveTier, setFreeCamera } = useMetrics();
   const { timeOfDay, sunRotation, manualTimeOfDay, manualSunRotation, onTimeOfDayChange, onSunRotationChange, lightingOverride, setLightingOverride } = useLighting();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -82,6 +84,10 @@ function TourExperienceInner({
       el.removeEventListener("touchmove", onTouchMove);
     };
   }, [addDelta, freeCamera]);
+
+  const handleToggleFreeCamera = () => {
+    setFreeCamera(!freeCamera);
+  };
 
   return (
     <>
@@ -120,6 +126,7 @@ function TourExperienceInner({
             <Scene
               timeOfDay={effectiveTimeOfDay}
               sunRotation={effectiveSunRotation}
+              wireframe={loadingPage}
               webgpu={false}
               contactShadows={sceneContactShadows}
             />
@@ -136,6 +143,13 @@ function TourExperienceInner({
             <div className="tour-ui__brand">
               <Image src="/logo-gemdam.png" alt="Gemdam" width={200} height={100} className="tour-ui__brand-img" />
             </div>
+            <button
+              type="button"
+              className="tour-ui__freecamera-btn"
+              onClick={handleToggleFreeCamera}
+            >
+              {freeCamera ? "Salir modo libre" : "Modo libre"}
+            </button>
             <FullscreenButton />
             <MetricsOverlay />
             <WaypointsUI />
@@ -154,7 +168,7 @@ function TourExperienceInner({
   );
 }
 
-const INTRO_ZOOM_PROGRESS = 0.1;
+const INTRO_ZOOM_PROGRESS = 0;
 
 function ExperienceWithIntro() {
   const [showIntro, setShowIntro] = useState(true);
@@ -175,6 +189,7 @@ function ExperienceWithIntro() {
       <LightingProvider>
         <TourExperienceInner
           hasStarted={!showIntro}
+          loadingPage={loadingPage}
           onLoadingComplete={handleLoadingComplete}
         />
         <IntroOverlay

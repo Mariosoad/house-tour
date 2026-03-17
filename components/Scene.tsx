@@ -83,6 +83,7 @@ function PostEffects({ effectiveTier }: { effectiveTier: EffectiveTier }) {
 export type SceneProps = {
   timeOfDay?: number;
   sunRotation?: number;
+  wireframe?: boolean;
   /** When true, avoid MeshDepthMat erial/ShaderMaterial (ContactShadows disabled for WebGPU). */
   webgpu?: boolean;
   contactShadows?: {
@@ -98,6 +99,7 @@ export type SceneProps = {
 export function Scene({
   timeOfDay = 0.4,
   sunRotation = 0,
+  wireframe = false,
 }: SceneProps) {
   const houseGroupRef = useRef<THREE.Group>(null);
   const { ssaoEnabled, effectiveTier } = useMetrics();
@@ -139,8 +141,10 @@ export function Scene({
   return (
     <>
       <Light_Environment timeOfDay={timeOfDay} sunRotation={sunRotation} effectiveTier={effectiveTier} />
-      <group ref={houseGroupRef}>
-        <House parentGroupRef={houseGroupRef} />
+      <group ref={houseGroupRef} 
+      // rotation={[0, 1.5, 0]}
+      >
+        <House parentGroupRef={houseGroupRef} wireframe={wireframe} />
       </group>
 
       {ssaoEnabled && <PostEffects effectiveTier={effectiveTier} />}

@@ -577,3 +577,15 @@ body {
 @keyframes intro-loading-spin {
   to { transform: rotate(360deg); }
 }
+
+.tour-ui__freecamera-btn{
+  position: absolute;
+  top: 1rem;
+  left: 0;
+  z-index: 10;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}

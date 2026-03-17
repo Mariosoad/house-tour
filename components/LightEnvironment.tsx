@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { Environment } from "@react-three/drei";
+import { Environment, useHelper } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
 import type { EffectiveTier } from "@/lib/metricsContext";
 
 function sunPosition(timeOfDay: number, sunRotationDeg: number): THREE.Vector3 {
@@ -37,6 +38,20 @@ export type LightEnvironmentProps = {
   timeOfDay?: number;
   sunRotation?: number;
   effectiveTier?: EffectiveTier;
+  /** SpotLight dinámico para acento: [x, y, z] */
+  spotLightPosition?: [number, number, number];
+  /** Objetivo del SpotLight (hacia dónde apunta) */
+  spotLightTarget?: [number, number, number];
+  spotLightIntensity?: number;
+  spotLightAngle?: number;
+  spotLightPenumbra?: number;
+  spotLightDistance?: number;
+  /** Muestra helpers/markers para ubicar el SpotLight */
+  debugSpotLight?: boolean;
+  /** Tamaño de los marcadores del modo debug */
+  debugSpotLightMarkerSize?: number;
+  /** Multiplicador de intensidad cuando debug está activo */
+  debugSpotLightIntensityBoost?: number;
 };
 
 function shadowMapSize(tier: EffectiveTier): [number, number] {
@@ -54,20 +69,42 @@ function envRotationFromSun(pos: THREE.Vector3): [number, number, number] {
   return [elevation, azimuth, 1.4];
 }
 
-export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0, effectiveTier = "ultra" }: LightEnvironmentProps) {
+export function Light_Environment({
+  timeOfDay = 0.4,
+  sunRotation = 0,
+  effectiveTier = "ultra",
+  spotLightTarget = [0, 0.5, 0],
+  debugSpotLight = true,
+}: LightEnvironmentProps) {
+  const { camera } = useThree();
   const lightTarget = useMemo(() => {
     const t = new THREE.Object3D();
     t.position.set(0, 0, 0);
     return t;
   }, []);
+  const spotTarget = useMemo(() => {
+    const t = new THREE.Object3D();
+    t.position.set(spotLightTarget[2], spotLightTarget[1], spotLightTarget[2]);
+    t.position.set(0, 0, 10);
+    return t;
+  }, [spotLightTarget]);
+
+  const spotRef = useRef<THREE.SpotLight>(null!);
+  const pointRef = useRef<THREE.PointLight>(null!);
+  const pointRef2 = useRef<THREE.PointLight>(null!);
+  useHelper(debugSpotLight ? spotRef : null, THREE.SpotLightHelper, "cyan");
   const pos = sunPosition(timeOfDay, sunRotation);
   const { color, intensity } = sunColorAndIntensity(timeOfDay);
-  const envIntensity = 0.25 + 0.35 * (1 - Math.min(1, Math.abs((timeOfDay * 14 + 5 - 12) / 7)));
+  console.log("camera.positionX", camera.position.x);
+  console.log("camera.positionY", camera.position.y);
+  console.log("camera.positionZ", camera.position.z);
+  const isOffLighting = camera.position.x >= -0.71 && camera.position.z <= -0.1 || camera.position.z <= -0.02
 
   return (
     <>
       <ambientLight intensity={0.02} />
       <primitive object={lightTarget} />
+      <primitive object={spotTarget} />
       <directionalLight
         position={[pos.x, pos.y, pos.z]}
         intensity={intensity}
@@ -82,12 +119,53 @@ export function Light_Environment({ timeOfDay = 0.4, sunRotation = 0, effectiveT
         shadow-camera-left={-6}
         shadow-bias={-0.0005}
         shadow-normalBias={0.01}
-      />
+        />
+        <hemisphereLight
+          position={[0, 0, 0]}
+          intensity={0.2}
+          color={"#FFD6A3"}
+        />
+        <pointLight
+          ref={pointRef}
+          position={[0.7, 0.5, -0.08]}
+          intensity={isOffLighting ? 0 : 0.4}
+          color={"#FFD6A3"}
+        />
+        <pointLight
+          ref={pointRef2}
+          position={[-0.75, 0.7, 1.7]}
+          intensity={isOffLighting ? 0 : 0.6}
+          color={"#FFD6A3"}
+        />
+        {/* <spotLight
+          ref={spotRef}
+          position={[0.7, 0.5, -0.11]}
+          target={spotTarget}
+          intensity={2}
+          color={"#FFD6A3"}
+          angle={Math.PI / 2}
+          penumbra={0.5}
+          distance={0}
+          castShadow
+          shadow-mapSize={shadowMapSize(effectiveTier)}
+          shadow-bias={-0.0005}
+        /> */}
+        {/* <group>
+          <mesh position={spotLightPosition} frustumCulled={false}>
+            <sphereGeometry args={[debugSpotLightMarkerSize, 16, 16]} />
+            <meshBasicMaterial color="#00E5FF" depthTest={false} toneMapped={false} />
+          </mesh>
+          <mesh position={spotLightTarget} frustumCulled={false}>
+            <sphereGeometry args={[debugSpotLightMarkerSize * 0.9, 16, 16]} />
+            <meshBasicMaterial color="#FFB300" depthTest={false} toneMapped={false} />
+          </mesh>
+        </group> */}
       <Environment
         files="/Coast_Palms_HDRI.hdr"
         background
-        environmentIntensity={Math.max(0.08, envIntensity)}
-        environmentRotation={envRotationFromSun(pos)}
+        environmentIntensity={0.3}
+        backgroundRotation={[0, Math.PI / -3, 0]}
+        environmentRotation={[0, Math.PI / -3, 0]}
       />
     </>
   );

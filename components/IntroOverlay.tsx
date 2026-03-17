@@ -31,7 +31,6 @@ export function IntroOverlay({ onStart, loadingPage = true, className = "" }: In
       role="dialog"
       aria-label="Pantalla de bienvenida"
     >
-      <div className="intro-overlay__backdrop" aria-hidden="true" />
       <div className="intro-overlay__content">
         <div>
           <p className="intro-overlay__subtitle">THREEJS SSGI <br/> & <br/> N8A0</p>
