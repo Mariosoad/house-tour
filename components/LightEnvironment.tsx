@@ -55,8 +55,7 @@ export type LightEnvironmentProps = {
 };
 
 function shadowMapSize(tier: EffectiveTier): [number, number] {
-  if (tier === "low") return [2048, 2048];
-  if (tier === "medium") return [3072, 3072];
+  if (tier === "low") return [512, 512];
   return [4096, 4096];
 }
 

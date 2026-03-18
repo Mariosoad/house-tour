@@ -107,7 +107,7 @@ export function MirrorReplica({ sourceMesh, parentGroupRef, rotationX, rotationY
   });
 
   const geometry = useMemo(() => createMirrorPlaneGeometry(sourceMesh), [sourceMesh]);
-  const reflectorResolution = effectiveTier === "medium" ? 256 : 1024;
+  const reflectorResolution = effectiveTier === "low" ? 512 : 1024;
   const setRef = useCallback((node: THREE.Mesh | null) => {
     (meshRef as MutableRefObject<THREE.Mesh | null>).current = node;
     if (node) node.userData.cannotReceiveAO = true; // Excluir del SSAO para evitar oscurecimiento

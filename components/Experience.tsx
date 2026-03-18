@@ -102,8 +102,6 @@ function TourExperienceInner({
           dpr={
             effectiveTier === "low"
               ? [1, 1.5]
-              : effectiveTier === "medium"
-                ? [1, Math.min(1.75, typeof window !== "undefined" ? window.devicePixelRatio : 1.75)]
                 : [1, Math.min(2, typeof window !== "undefined" ? window.devicePixelRatio : 2)]
           }
           gl={{

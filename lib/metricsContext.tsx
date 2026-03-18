@@ -3,8 +3,7 @@
 import { createContext, useContext, useState, useCallback, useMemo, useEffect, useRef } from "react";
 
 export type PerformanceTier = "low" | "ultra";
-/** Effective tier used for rendering; includes adaptive "medium" when FPS drops on ultra PCs */
-export type EffectiveTier = "low" | "medium" | "ultra";
+export type EffectiveTier = "low" | "ultra";
 
 function detectPerformanceTier(): PerformanceTier {
   if (typeof window === "undefined") return "ultra";
@@ -28,7 +27,6 @@ export type MetricsContextValue = {
   ssaoEnabled: boolean;
   setSsaoEnabled: (v: boolean) => void;
   performanceTier: PerformanceTier;
-  /** Adaptive tier; uses "medium" when ultra PCs sustain low FPS */
   effectiveTier: EffectiveTier;
 };
 
@@ -58,13 +56,13 @@ function useEffectiveTier(performanceTier: PerformanceTier, fps: number): Effect
       if (current === "ultra") {
         lowSince.current ??= now;
         if (now - lowSince.current >= DOWNSAMPLE_TIME_MS) {
-          setEffectiveTier("medium");
+          setEffectiveTier("low");
           highSince.current = null;
         }
       }
     } else if (fps >= FPS_UPGRADE_THRESHOLD) {
       lowSince.current = null;
-      if (current === "medium") {
+      if (current === "low") {
         highSince.current ??= now;
         if (now - highSince.current >= UPSAMPLE_TIME_MS) {
           setEffectiveTier("ultra");
@@ -84,7 +82,7 @@ export function MetricsProvider({ children }: { children: React.ReactNode }) {
   const [fps, setFps] = useState(0);
   const [freeCamera, setFreeCamera] = useState(false);
   const [ssaoEnabled, setSsaoEnabled] = useState(true);
-  const performanceTier = useMemo(detectPerformanceTier, []);
+  const performanceTier = useMemo(() => detectPerformanceTier(), []);
   const effectiveTier = useEffectiveTier(performanceTier, fps);
   const setFreeCameraStable = useCallback((v: boolean) => setFreeCamera(v), []);
   const setSsaoEnabledStable = useCallback((v: boolean) => setSsaoEnabled(v), []);

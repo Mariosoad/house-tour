@@ -19,7 +19,7 @@ export function LightingSync() {
 
     // Evita re-render de React en cada frame (caro en móvil).
     const now = performance.now();
-    const updateIntervalMs = effectiveTier === "low" ? 160 : effectiveTier === "medium" ? 120 : 80;
+    const updateIntervalMs = effectiveTier === "low" ? 150 : 50;
     if (now - lastUpdateRef.current < updateIntervalMs) return;
     lastUpdateRef.current = now;
 
