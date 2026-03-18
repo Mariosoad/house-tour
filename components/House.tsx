@@ -2,12 +2,12 @@
 "use client";
 
 import type { RefObject } from "react";
-import { useEffect, useState } from "react";
-import { useFrame } from "@react-three/fiber";
-import { useThree } from "@react-three/fiber";
-import { useGLTF } from "@react-three/drei";
+import { useEffect, useMemo, useState } from "react";
+import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import type * as THREEType from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
 import { MirrorReplica } from "./MirrorReplica";
 
 type GLTFResult = { scene: THREEType.Group };
@@ -36,11 +36,24 @@ type HouseProps = {
 };
 
 export function House({ parentGroupRef, wireframe = false }: HouseProps) {
-  const { scene } = useGLTF(
-    MODEL_URL,
-    true,
-    true
-  ) as unknown as GLTFResult;
+  const { gl } = useThree();
+
+  // GLB puede traer texturas KTX2. THREE.GLTFLoader requiere
+  // setKTX2Loader(ktx2Loader) antes de que intente cargarlas.
+  const ktx2Loader = useMemo(() => {
+    const loader = new KTX2Loader();
+    // Basis transcoder provisto por three via CDN (necesario para decodificar KTX2).
+    loader.setTranscoderPath("https://unpkg.com/three@0.181.2/examples/jsm/libs/basis/");
+    // Detecta soporte del renderer antes de que el loader cargue KTX2.
+    loader.detectSupport(gl);
+    return loader;
+  }, [gl]);
+
+  const gltf = useLoader(GLTFLoader, MODEL_URL, (loader) => {
+    loader.setKTX2Loader(ktx2Loader);
+  }) as unknown as GLTFResult & { scene: THREEType.Group };
+
+  const { scene } = gltf;
   const [mirrorMeshes, setMirrorMeshes] = useState<THREE.Mesh[]>([]);
   const [fanMeshes, setFanMeshes] = useState<THREE.Mesh[]>([]);
   const [wireframeScene, setWireframeScene] = useState<THREE.Group | null>(null);

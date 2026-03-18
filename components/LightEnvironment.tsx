@@ -61,6 +61,7 @@ function shadowMapSize(tier: EffectiveTier): [number, number] {
 }
 
 /** Convierte la posición del sol en rotación del HDRI para que la iluminación venga de la misma dirección/altura */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function envRotationFromSun(pos: THREE.Vector3): [number, number, number] {
   const len = pos.length();
   if (len < 0.01) return [0.4, 0, 1.4];
@@ -137,34 +138,15 @@ export function Light_Environment({
           intensity={isOffLighting ? 0 : 0.6}
           color={"#FFD6A3"}
         />
-        {/* <spotLight
-          ref={spotRef}
-          position={[0.7, 0.5, -0.11]}
-          target={spotTarget}
-          intensity={2}
-          color={"#FFD6A3"}
-          angle={Math.PI / 2}
-          penumbra={0.5}
-          distance={0}
-          castShadow
-          shadow-mapSize={shadowMapSize(effectiveTier)}
-          shadow-bias={-0.0005}
-        /> */}
-        {/* <group>
-          <mesh position={spotLightPosition} frustumCulled={false}>
-            <sphereGeometry args={[debugSpotLightMarkerSize, 16, 16]} />
-            <meshBasicMaterial color="#00E5FF" depthTest={false} toneMapped={false} />
-          </mesh>
-          <mesh position={spotLightTarget} frustumCulled={false}>
-            <sphereGeometry args={[debugSpotLightMarkerSize * 0.9, 16, 16]} />
-            <meshBasicMaterial color="#FFB300" depthTest={false} toneMapped={false} />
-          </mesh>
-        </group> */}
       <Environment
         files="/Coast_Palms_HDRI.hdr"
         background
-        environmentIntensity={0.3}
+        environmentIntensity={0}
         backgroundRotation={[0, Math.PI / -3, 0]}
+      />
+      <Environment
+        files="/Coast_Palms_HDRI_1K.hdr"
+        environmentIntensity={0.3}
         environmentRotation={[0, Math.PI / -3, 0]}
       />
     </>
