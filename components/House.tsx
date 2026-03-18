@@ -4,8 +4,10 @@
 import type { RefObject } from "react";
 import { useEffect, useState } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { KTX2Loader } from "three-stdlib";
 import type * as THREEType from "three";
 import { MirrorReplica } from "./MirrorReplica";
 
@@ -35,7 +37,18 @@ type HouseProps = {
 };
 
 export function House({ parentGroupRef, wireframe = false }: HouseProps) {
-  const { scene } = useGLTF(MODEL_URL) as unknown as GLTFResult;
+  const { gl } = useThree();
+  const { scene } = useGLTF(
+    MODEL_URL,
+    true,
+    true,
+    (loader) => {
+      const ktx2Loader = new KTX2Loader();
+      ktx2Loader.setTranscoderPath("https://unpkg.com/three@0.172.0/examples/jsm/libs/basis/");
+      ktx2Loader.detectSupport(gl);
+      loader.setKTX2Loader(ktx2Loader);
+    }
+  ) as unknown as GLTFResult;
   const [mirrorMeshes, setMirrorMeshes] = useState<THREE.Mesh[]>([]);
   const [fanMeshes, setFanMeshes] = useState<THREE.Mesh[]>([]);
   const [wireframeScene, setWireframeScene] = useState<THREE.Group | null>(null);
@@ -156,5 +169,3 @@ export function House({ parentGroupRef, wireframe = false }: HouseProps) {
     </>
   );
 }
-
-useGLTF.preload(MODEL_URL);

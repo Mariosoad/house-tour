@@ -95,9 +95,9 @@ export function Light_Environment({
   useHelper(debugSpotLight ? spotRef : null, THREE.SpotLightHelper, "cyan");
   const pos = sunPosition(timeOfDay, sunRotation);
   const { color, intensity } = sunColorAndIntensity(timeOfDay);
-  console.log("camera.positionX", camera.position.x);
-  console.log("camera.positionY", camera.position.y);
-  console.log("camera.positionZ", camera.position.z);
+  // console.log("camera.positionX", camera.position.x);
+  // console.log("camera.positionY", camera.position.y);
+  // console.log("camera.positionZ", camera.position.z);
   const isOffLighting = camera.position.x >= -0.71 && camera.position.z <= -0.1 || camera.position.z <= -0.02
 
   return (
