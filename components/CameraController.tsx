@@ -15,13 +15,14 @@ function FirstPersonMover() {
   const { camera } = useThree();
   const dir = useRef(new THREE.Vector3());
   const right = useRef(new THREE.Vector3());
+  const up = useRef(new THREE.Vector3(0, 1, 0));
 
   useFrame(() => {
     const { forward, backward, left, right: rightKey } = getKeys();
     if (!forward && !backward && !left && !rightKey) return;
 
     camera.getWorldDirection(dir.current);
-    right.current.crossVectors(dir.current, new THREE.Vector3(0, 1, 0)).normalize();
+    right.current.crossVectors(dir.current, up.current).normalize();
 
     if (forward) camera.position.addScaledVector(dir.current, MOVE_SPEED);
     if (backward) camera.position.addScaledVector(dir.current, -MOVE_SPEED);

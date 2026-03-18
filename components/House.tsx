@@ -2,13 +2,14 @@
 "use client";
 
 import type { RefObject } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import type * as THREEType from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
 import { MirrorReplica } from "./MirrorReplica";
+import { useMetrics } from "@/lib/metricsContext";
 
 type GLTFResult = { scene: THREEType.Group };
 
@@ -37,6 +38,33 @@ type HouseProps = {
 
 export function House({ parentGroupRef, wireframe = false }: HouseProps) {
   const { gl } = useThree();
+  const { effectiveTier } = useMetrics();
+  const glassMaterial = useMemo(() => {
+    const color = 0xcfe9ff;
+    if (effectiveTier === "low") {
+      // Mucho más barato que `MeshPhysicalMaterial` con `transmission` (evita refracción/transmisión).
+      return new THREE.MeshStandardMaterial({
+        color,
+        transparent: true,
+        opacity: 0.6,
+        depthWrite: false,
+        roughness: 0.15,
+        metalness: 0,
+      });
+    }
+
+    return new THREE.MeshPhysicalMaterial({
+      color,
+      transmission: 1,
+      opacity: 0.6,
+      transparent: true,
+      depthWrite: false,
+      roughness: 0.1,
+      metalness: 0,
+      ior: 1.2,
+      thickness: 0.5,
+    });
+  }, [effectiveTier]);
 
   // GLB puede traer texturas KTX2. THREE.GLTFLoader requiere
   // setKTX2Loader(ktx2Loader) antes de que intente cargarlas.
@@ -57,6 +85,7 @@ export function House({ parentGroupRef, wireframe = false }: HouseProps) {
   const [mirrorMeshes, setMirrorMeshes] = useState<THREE.Mesh[]>([]);
   const [fanMeshes, setFanMeshes] = useState<THREE.Mesh[]>([]);
   const [wireframeScene, setWireframeScene] = useState<THREE.Group | null>(null);
+  const fanAxis = useRef(new THREE.Vector3(0, 0, 1));
 
   useEffect(() => {
     const mirrors: THREE.Mesh[] = [];
@@ -78,17 +107,7 @@ export function House({ parentGroupRef, wireframe = false }: HouseProps) {
               hasMirror = true;
             } else if (isGlassMaterial(mat)) {
               hasGlass = true;
-              materials[i] = new THREE.MeshPhysicalMaterial({
-                color: 0xcfe9ff,
-                transmission: 1,
-                opacity: 0.6,
-                transparent: true,
-                depthWrite: false,
-                roughness: 0.1,
-                metalness: 0,
-                ior: 1.2,
-                thickness: 0.5,
-              });
+              materials[i] = glassMaterial;
               mesh.userData.cannotReceiveAO = true;
             }
           });
@@ -97,17 +116,7 @@ export function House({ parentGroupRef, wireframe = false }: HouseProps) {
             hasMirror = true;
           } else if (isGlassMaterial(mesh.material)) {
             hasGlass = true;
-            mesh.material = new THREE.MeshPhysicalMaterial({
-              color: 0xcfe9ff,
-              transmission: 1,
-              opacity: 0.6,
-              transparent: true,
-              depthWrite: false,
-              roughness: 0.1,
-              metalness: 0,
-              ior: 1.2,
-              thickness: 0.5,
-            });
+            mesh.material = glassMaterial;
             mesh.userData.cannotReceiveAO = true;
           }
         }
@@ -122,7 +131,7 @@ export function House({ parentGroupRef, wireframe = false }: HouseProps) {
     });
     setMirrorMeshes(mirrors);
     setFanMeshes(fans);
-  }, [scene]);
+  }, [scene, glassMaterial]);
 
   useEffect(() => {
     if (!scene) return;
@@ -145,7 +154,7 @@ export function House({ parentGroupRef, wireframe = false }: HouseProps) {
     if (!fanMeshes.length) return;
   
     fanMeshes.forEach((fan) => {
-      fan.rotateOnAxis(new THREE.Vector3(0, 0, 1), FAN_ROTATION_SPEED * delta);
+      fan.rotateOnAxis(fanAxis.current, FAN_ROTATION_SPEED * delta);
     });
   });
 
@@ -156,19 +165,21 @@ export function House({ parentGroupRef, wireframe = false }: HouseProps) {
       ) : (
         <>
           <primitive object={scene} />
-          {mirrorMeshes.map((m) => (
-            <MirrorReplica
-              key={m.uuid}
-              sourceMesh={m}
-              parentGroupRef={parentGroupRef}
-              rotationX={90}
-              rotationY={0}
-              rotationZ={0}
-              offsetX={0}
-              offsetY={0.95}
-              offsetZ={-3.3}
-            />
-          ))}
+          {effectiveTier === "low" ? null : (
+            mirrorMeshes.map((m) => (
+              <MirrorReplica
+                key={m.uuid}
+                sourceMesh={m}
+                parentGroupRef={parentGroupRef}
+                rotationX={90}
+                rotationY={0}
+                rotationZ={0}
+                offsetX={0}
+                offsetY={0.95}
+                offsetZ={-3.3}
+              />
+            ))
+          )}
         </>
       )}
     </>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useTourScroll } from "@/lib/tourScrollContext";
 import { useLighting } from "@/lib/lightingContext";
@@ -10,10 +11,18 @@ import { getLightingAtProgress } from "@/lib/waypoints";
 export function LightingSync() {
   const { cameraTRef } = useTourScroll();
   const { setTourLighting } = useLighting();
-  const { freeCamera } = useMetrics();
+  const { freeCamera, effectiveTier } = useMetrics();
+  const lastUpdateRef = useRef(0);
 
   useFrame(() => {
     if (freeCamera) return;
+
+    // Evita re-render de React en cada frame (caro en móvil).
+    const now = performance.now();
+    const updateIntervalMs = effectiveTier === "low" ? 160 : effectiveTier === "medium" ? 120 : 80;
+    if (now - lastUpdateRef.current < updateIntervalMs) return;
+    lastUpdateRef.current = now;
+
     const t = cameraTRef.current;
     const { timeOfDay, sunRotation } = getLightingAtProgress(t);
     setTourLighting(timeOfDay, sunRotation);

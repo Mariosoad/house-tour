@@ -23,6 +23,7 @@ export function ScrollTour() {
   const currentT = useRef(0);
   const currentPosition = useRef(new THREE.Vector3());
   const currentTarget = useRef(new THREE.Vector3());
+  const lookAtTarget = useRef(new THREE.Vector3());
   const initialized = useRef(false);
 
   // Inicialización: usar valores fijos para consistencia entre local y producción
@@ -77,8 +78,8 @@ export function ScrollTour() {
     cameraTRef.current = t;
 
     camera.position.lerp(currentPosition.current, 1 - Math.exp(-DAMPING * delta));
-    const lookAtTarget = currentTarget.current.clone();
-    camera.lookAt(lookAtTarget);
+    lookAtTarget.current.copy(currentTarget.current);
+    camera.lookAt(lookAtTarget.current);
   });
 
   return null;

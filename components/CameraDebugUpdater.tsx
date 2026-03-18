@@ -21,11 +21,13 @@ export function CameraDebugUpdater() {
   const positionCurve = useMemo(() => getPositionCurve(), []);
   const targetCurve = useMemo(() => getTargetCurve(), []);
   const currentT = useRef(0);
+  const posRef = useRef(new THREE.Vector3());
+  const tgtRef = useRef(new THREE.Vector3());
 
   useFrame((_, delta) => {
     if (!debug?.infoRef || !debug.enabled) return;
-    const pos = new THREE.Vector3();
-    const tgt = new THREE.Vector3();
+    const pos = posRef.current;
+    const tgt = tgtRef.current;
     let t: number;
 
     if (freeCamera) {

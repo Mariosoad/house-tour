@@ -53,14 +53,38 @@ export function MirrorReplica({ sourceMesh, parentGroupRef, rotationX, rotationY
   const scene = useThree((s) => s.scene);
   const matrix = useRef(new THREE.Matrix4());
   const invParent = useRef(new THREE.Matrix4());
+  const { effectiveTier } = useMetrics();
 
-  const degToRad = (deg: number) => deg * (Math.PI / 180);
-  const hasRotation = (rotationX ?? 0) !== 0 || (rotationY ?? 0) !== 0 || (rotationZ ?? 0) !== 0;
-  const hasOffset = (offsetX ?? 0) !== 0 || (offsetY ?? 0) !== 0 || (offsetZ ?? 0) !== 0;
-  const rotMat = useRef(new THREE.Matrix4());
-  const translMat = useRef(new THREE.Matrix4());
+  // Coste: evitar allocations dentro de `useFrame`.
+  const rotMatStatic = useMemo(() => {
+    const rx = rotationX ?? 0;
+    const ry = rotationY ?? 0;
+    const rz = rotationZ ?? 0;
+    const hasRotation = rx !== 0 || ry !== 0 || rz !== 0;
+    if (!hasRotation) return null;
+    const degToRad = (deg: number) => deg * (Math.PI / 180);
+    const euler = new THREE.Euler(degToRad(rx), degToRad(ry), degToRad(rz));
+    const m = new THREE.Matrix4();
+    m.makeRotationFromEuler(euler);
+    return m;
+  }, [rotationX, rotationY, rotationZ]);
+
+  const translMatStatic = useMemo(() => {
+    const ox = offsetX ?? 0;
+    const oy = offsetY ?? 0;
+    const oz = offsetZ ?? 0;
+    const hasOffset = ox !== 0 || oy !== 0 || oz !== 0;
+    if (!hasOffset) return null;
+    const m = new THREE.Matrix4();
+    m.makeTranslation(ox, oy, oz);
+    return m;
+  }, [offsetX, offsetY, offsetZ]);
+
+  // En móvil low-end evitamos el costo del render-to-texture de reflejos.
+  const mirrorEnabled = effectiveTier !== "low";
 
   useFrame(() => {
+    if (!mirrorEnabled) return;
     const mesh = meshRef.current;
     const parent = parentGroupRef.current;
     if (!mesh || !sourceMesh || !parent) return;
@@ -70,19 +94,12 @@ export function MirrorReplica({ sourceMesh, parentGroupRef, rotationX, rotationY
 
     matrix.current.copy(invParent.current).multiply(sourceMesh.matrixWorld);
 
-    if (hasRotation) {
-      const euler = new THREE.Euler(
-        degToRad(rotationX ?? 0),
-        degToRad(rotationY ?? 0),
-        degToRad(rotationZ ?? 0),
-      );
-      rotMat.current.makeRotationFromEuler(euler);
-      matrix.current.premultiply(rotMat.current);
+    if (rotMatStatic) {
+      matrix.current.premultiply(rotMatStatic);
     }
 
-    if (hasOffset) {
-      translMat.current.makeTranslation(offsetX ?? 0, offsetY ?? 0, offsetZ ?? 0);
-      matrix.current.premultiply(translMat.current);
+    if (translMatStatic) {
+      matrix.current.premultiply(translMatStatic);
     }
 
     mesh.matrix.copy(matrix.current);
@@ -90,13 +107,12 @@ export function MirrorReplica({ sourceMesh, parentGroupRef, rotationX, rotationY
   });
 
   const geometry = useMemo(() => createMirrorPlaneGeometry(sourceMesh), [sourceMesh]);
-  const { performanceTier } = useMetrics();
-  const reflectorResolution = performanceTier === "low" ? 128 : 2048;
+  const reflectorResolution = effectiveTier === "medium" ? 256 : 1024;
   const setRef = useCallback((node: THREE.Mesh | null) => {
     (meshRef as MutableRefObject<THREE.Mesh | null>).current = node;
     if (node) node.userData.cannotReceiveAO = true; // Excluir del SSAO para evitar oscurecimiento
   }, []);
-  if (!geometry) return null;
+  if (!mirrorEnabled || !geometry) return null;
 
   return (
     <mesh ref={setRef} geometry={geometry} renderOrder={1}>
