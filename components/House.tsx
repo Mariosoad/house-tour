@@ -44,9 +44,12 @@ export function House({ parentGroupRef, wireframe = false }: HouseProps) {
     if (effectiveTier === "low") {
       // Mucho más barato que `MeshPhysicalMaterial` con `transmission` (evita refracción/transmisión).
       return new THREE.MeshStandardMaterial({
-        color,
+        // En `low` no usamos `transmission`, así que este material se ve más como plástico si
+        // lo teñimos fuerte. Para que "se vea vidrio", lo desaturamos al máximo.
+        color: 0xffffff,
         transparent: true,
-        opacity: 0.6,
+        // Ajusta la translucidez para que no se perciba un "color opaco" sobre el vidrio.
+        opacity: 0.15,
         depthWrite: false,
         roughness: 0.15,
         metalness: 0,
