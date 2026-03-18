@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLighting } from "@/lib/lightingContext";
 
 export type LightingControlsProps = {
   timeOfDay: number;
@@ -42,11 +43,28 @@ export function LightingControls({
   lightingOverride = false,
   onSyncWithTour,
 }: LightingControlsProps) {
+  const { setShadowScrubbing } = useLighting();
   const [preset, setPreset] = useState<string>("Dusk");
   const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const hourMinRef = useRef<HTMLSpanElement>(null);
   const ampmRef = useRef<HTMLSpanElement>(null);
+
+  const endShadowScrubbing = useCallback(() => {
+    setShadowScrubbing(false);
+  }, [setShadowScrubbing]);
+
+  const startShadowScrubbing = useCallback(() => {
+    setShadowScrubbing(true);
+
+    // Robust: if the pointer leaves the slider, we still get a release event.
+    if (typeof window === "undefined") return;
+    window.addEventListener("pointerup", endShadowScrubbing, { once: true });
+    window.addEventListener("pointercancel", endShadowScrubbing, { once: true });
+    window.addEventListener("touchend", endShadowScrubbing, { once: true });
+    window.addEventListener("touchcancel", endShadowScrubbing, { once: true });
+    window.addEventListener("blur", endShadowScrubbing, { once: true });
+  }, [endShadowScrubbing, setShadowScrubbing]);
 
   useEffect(() => {
     if (!dropdownOpen) return;
@@ -310,6 +328,8 @@ export function LightingControls({
             step={0.005}
             value={timeOfDay}
             onChange={(e) => onTimeOfDayChange(Number(e.target.value))}
+            onPointerDown={startShadowScrubbing}
+            onTouchStart={startShadowScrubbing}
             className="lighting-range lighting-range-time"
           />
         </div>
@@ -380,6 +400,8 @@ export function LightingControls({
             step={1}
             value={sunRotation}
             onChange={(e) => onSunRotationChange(Number(e.target.value))}
+            onPointerDown={startShadowScrubbing}
+            onTouchStart={startShadowScrubbing}
             className="lighting-range lighting-range-rotation"
           />
         </div>

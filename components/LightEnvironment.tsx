@@ -38,6 +38,8 @@ export type LightEnvironmentProps = {
   timeOfDay?: number;
   sunRotation?: number;
   effectiveTier?: EffectiveTier;
+  /** When true, temporarily reduce shadow-map resolution during slider scrubbing */
+  shadowScrubbing?: boolean;
   /** SpotLight dinámico para acento: [x, y, z] */
   spotLightPosition?: [number, number, number];
   /** Objetivo del SpotLight (hacia dónde apunta) */
@@ -54,8 +56,11 @@ export type LightEnvironmentProps = {
   debugSpotLightIntensityBoost?: number;
 };
 
-function shadowMapSize(tier: EffectiveTier): [number, number] {
-  if (tier === "low") return [1024, 1024];
+function shadowMapSize(tier: EffectiveTier, shadowScrubbing: boolean | undefined): [number, number] {
+  if (shadowScrubbing) return [1024, 1024];
+
+  // Default quality by tier.
+  if (tier === "low") return [2048, 2048];
   return [4096, 4096];
 }
 
@@ -73,6 +78,7 @@ export function Light_Environment({
   timeOfDay = 0.4,
   sunRotation = 0,
   effectiveTier = "ultra",
+  shadowScrubbing = false,
   spotLightTarget = [0, 0.5, 0],
   debugSpotLight = true,
 }: LightEnvironmentProps) {
@@ -114,7 +120,7 @@ export function Light_Environment({
         intensity={intensity}
         color={color}
         castShadow
-        shadow-mapSize={shadowMapSize(effectiveTier)}
+        shadow-mapSize={shadowMapSize(effectiveTier, shadowScrubbing)}
         shadow-camera-near={1}
         shadow-camera-far={40}
         shadow-camera-top={6}

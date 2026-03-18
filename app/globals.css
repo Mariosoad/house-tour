@@ -73,7 +73,6 @@ body {
   left: 52px;
   transform: translateX(-50%);
   z-index: 10;
-  pointer-events: none;
 }
 .tour-ui__brand-img {
   height: 40px;
@@ -448,7 +447,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12.5rem;
+  gap: 4.5rem;
   text-align: center;
   padding: 2rem;
 }
@@ -546,6 +545,7 @@ body {
   animation: scroll-wheel-pulse 2s ease-in-out infinite;
 }
 .intro-overlay__scroll-text {
+  color: white;
   font-size: 0.8rem;
   letter-spacing: 0.08em;
   opacity: 0.9;

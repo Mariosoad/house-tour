@@ -32,10 +32,13 @@ export function IntroOverlay({ onStart, loadingPage = true, className = "" }: In
       aria-label="Pantalla de bienvenida"
     >
       <div className="intro-overlay__content">
-        <div>
-          <p className="intro-overlay__subtitle">THREEJS SSGI <br/> & <br/> N8A0</p>
-          <br/> 
-          <p className="intro-overlay__subtitle_author">By Mario Hinostroza & Rodrigo Isasmendi</p>
+        <div style={{textAlign: "center", alignItems: "center", display: "flex", flexDirection: "column", justifyContent: "center"}}>
+          {/* <p className="intro-overlay__subtitle">THREEJS SSGI <br/> & <br/> N8A0</p> */}
+          {/* <p className="intro-overlay__subtitle">THREEJS ARCHVIZ TOUR</p> */}
+          <p className="intro-overlay__subtitle">DELUXE VILLA</p>
+          <p className="intro-overlay__subtitle_author" style={{marginBottom: "2rem"}}>THREEJS ARCHVIZ TOUR</p>
+          <img src="./FulleLogo.png" alt="Fulle" width={200} height={120} className="intro-overlay__brand-img" />
+          {/* <p className="intro-overlay__subtitle_author">By Mario Hinostroza & Rodrigo Isasmendi</p> */}
         </div>
         {loadingPage ? (
           <div className="intro-overlay__loading" aria-live="polite" aria-label="Cargando">

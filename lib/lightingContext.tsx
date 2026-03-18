@@ -19,6 +19,10 @@ export type LightingContextValue = {
   tourTimeOfDay: number;
   tourSunRotation: number;
   setTourLighting: (timeOfDay: number, sunRotation: number) => void;
+
+  /** When true, temporarily lower expensive shadow resolution during slider scrubbing */
+  shadowScrubbing: boolean;
+  setShadowScrubbing: (v: boolean) => void;
 };
 
 const LightingContext = createContext<LightingContextValue | null>(null);
@@ -29,6 +33,7 @@ export function LightingProvider({ children }: { children: React.ReactNode }) {
   const [manualSunRotation, setManualSunRotation] = useState(0);
   const [tourTimeOfDay, setTourTimeOfDayState] = useState(0.25);
   const [tourSunRotation, setTourSunRotationState] = useState(15);
+  const [shadowScrubbing, setShadowScrubbing] = useState(false);
 
   const setTourLighting = useCallback((timeOfDay: number, sunRotation: number) => {
     setTourTimeOfDayState(timeOfDay);
@@ -68,6 +73,9 @@ export function LightingProvider({ children }: { children: React.ReactNode }) {
     tourTimeOfDay,
     tourSunRotation,
     setTourLighting,
+
+    shadowScrubbing,
+    setShadowScrubbing,
   };
 
   return (

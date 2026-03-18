@@ -13,9 +13,7 @@ import { ScrollTour } from "@/components/ScrollTour";
 import { LightingSync } from "@/components/LightingSync";
 import { CameraDebugUpdater } from "@/components/CameraDebugUpdater";
 import { CameraController } from "@/components/CameraController";
-import { FPSReporter } from "@/components/FPSReporter";
 import { WaypointsUI } from "@/components/WaypointsUI";
-import { MetricsOverlay } from "@/components/MetricsOverlay";
 import { TourBottomBar } from "@/components/TourBottomBar";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { TourDebugProvider } from "@/lib/tourDebugContext";
@@ -49,7 +47,7 @@ function TourExperienceInner({
   loadingPage: boolean;
 }) {
   const { addDelta } = useTourScroll();
-  const { freeCamera, effectiveTier, setFreeCamera } = useMetrics();
+  const { freeCamera, effectiveTier } = useMetrics();
   const { timeOfDay, sunRotation, manualTimeOfDay, manualSunRotation, onTimeOfDayChange, onSunRotationChange, lightingOverride, setLightingOverride } = useLighting();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -85,10 +83,6 @@ function TourExperienceInner({
     };
   }, [addDelta, freeCamera]);
 
-  const handleToggleFreeCamera = () => {
-    setFreeCamera(!freeCamera);
-  };
-
   return (
     <>
       <div
@@ -101,8 +95,8 @@ function TourExperienceInner({
           shadows
           dpr={
             effectiveTier === "low"
-              ? [1, 1.5]
-                : [1, Math.min(2, typeof window !== "undefined" ? window.devicePixelRatio : 2)]
+              ? [1, 1.35]
+              : [1, Math.min(2, typeof window !== "undefined" ? window.devicePixelRatio : 2)]
           }
           gl={{
             antialias: true,
@@ -132,14 +126,16 @@ function TourExperienceInner({
             <LightingSync />
             <CameraDebugUpdater />
             <CameraController />
-            <FPSReporter />
+            {/* <FPSReporter /> */}
           </Suspense>
         </Canvas>
 
         {hasStarted && (
           <>
             <div className="tour-ui__brand">
+              <a href="https://www.gemdam.com" target="_blank" rel="noopener noreferrer" style={{cursor: "pointer"}}>
               <Image src="/logo-gemdam.png" alt="Gemdam" width={200} height={100} className="tour-ui__brand-img" />
+              </a>
             </div>
             {/* <button
               type="button"
@@ -149,7 +145,7 @@ function TourExperienceInner({
               {freeCamera ? "Salir modo libre" : "Modo libre"}
             </button> */}
             <FullscreenButton />
-            <MetricsOverlay />
+            {/* <MetricsOverlay /> */}
             <WaypointsUI />
             <TourBottomBar
               timeOfDay={effectiveTimeOfDay}

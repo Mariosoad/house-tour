@@ -5,6 +5,7 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { EffectComposer } from "./EffectComposer";
 import { useMetrics, type EffectiveTier } from "@/lib/metricsContext";
+import { useLighting } from "@/lib/lightingContext";
 import { Light_Environment } from "./LightEnvironment";
 import { House } from "./House";
 
@@ -38,10 +39,14 @@ function ToneMappingEffectPrimitive() {
   return <primitive object={instance} dispose={null} />;
 }
 
-/** SMAA: HIGH en ultra/medium, MEDIUM en low */
+/** SMAA: HIGH en ultra, MEDIUM en low */
 function SMAAEffectPrimitive({ effectiveTier }: { effectiveTier: EffectiveTier }) {
   const instance = useMemo(
-    () => new SMAAEffect({ preset: effectiveTier === "low" ? SMAAPreset.MEDIUM : SMAAPreset.HIGH }),
+    () =>
+      new SMAAEffect({
+        // En low evitamos costo extra sin perder demasiado contraste.
+        preset: effectiveTier === "ultra" ? SMAAPreset.HIGH : SMAAPreset.MEDIUM,
+      }),
     [effectiveTier]
   );
   return <primitive object={instance} dispose={null} />;
@@ -49,10 +54,10 @@ function SMAAEffectPrimitive({ effectiveTier }: { effectiveTier: EffectiveTier }
 
 function PostEffects({ effectiveTier }: { effectiveTier: EffectiveTier }) {
   const needsNormalPass = ACTIVE_POST_EFFECT === "ssao";
-  const ssaoSamples = effectiveTier === "low" ? 24 : 42;
-  const ssaoRings = effectiveTier === "ultra" ? 4 : 3;
+  const ssaoSamples = effectiveTier === "low" ? 18 : 42;
+  const ssaoRings = effectiveTier === "ultra" ? 4 : 2;
   const ssaoIntensity = effectiveTier === "ultra" ? 1.5 : 1.0;
-  const multisampling = effectiveTier === "low" ? 4 : 8;
+  const multisampling = effectiveTier === "low" ? 2 : 8;
 
   const activeEffect =
     ACTIVE_POST_EFFECT === "ssao" && (
@@ -103,6 +108,7 @@ export function Scene({
 }: SceneProps) {
   const houseGroupRef = useRef<THREE.Group>(null);
   const { ssaoEnabled, effectiveTier } = useMetrics();
+  const { shadowScrubbing } = useLighting();
 
   useLayoutEffect(() => {
     const g = houseGroupRef.current;
@@ -140,7 +146,12 @@ export function Scene({
 
   return (
     <>
-      <Light_Environment timeOfDay={timeOfDay} sunRotation={sunRotation} effectiveTier={effectiveTier} />
+      <Light_Environment
+        timeOfDay={timeOfDay}
+        sunRotation={sunRotation}
+        effectiveTier={effectiveTier}
+        shadowScrubbing={shadowScrubbing}
+      />
       <group ref={houseGroupRef} 
       // rotation={[0, 1.5, 0]}
       >
