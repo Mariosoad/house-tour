@@ -143,13 +143,13 @@ function TourExperienceInner({
             <div className="tour-ui__brand">
               <Image src="/logo-gemdam.png" alt="Gemdam" width={200} height={100} className="tour-ui__brand-img" />
             </div>
-            <button
+            {/* <button
               type="button"
               className="tour-ui__freecamera-btn"
               onClick={handleToggleFreeCamera}
             >
               {freeCamera ? "Salir modo libre" : "Modo libre"}
-            </button>
+            </button> */}
             <FullscreenButton />
             <MetricsOverlay />
             <WaypointsUI />

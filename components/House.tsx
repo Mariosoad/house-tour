@@ -7,7 +7,6 @@ import { useFrame } from "@react-three/fiber";
 import { useThree } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-import { KTX2Loader } from "three-stdlib";
 import type * as THREEType from "three";
 import { MirrorReplica } from "./MirrorReplica";
 
@@ -37,17 +36,10 @@ type HouseProps = {
 };
 
 export function House({ parentGroupRef, wireframe = false }: HouseProps) {
-  const { gl } = useThree();
   const { scene } = useGLTF(
     MODEL_URL,
     true,
-    true,
-    (loader) => {
-      const ktx2Loader = new KTX2Loader();
-      ktx2Loader.setTranscoderPath("https://unpkg.com/three@0.172.0/examples/jsm/libs/basis/");
-      ktx2Loader.detectSupport(gl);
-      loader.setKTX2Loader(ktx2Loader);
-    }
+    true
   ) as unknown as GLTFResult;
   const [mirrorMeshes, setMirrorMeshes] = useState<THREE.Mesh[]>([]);
   const [fanMeshes, setFanMeshes] = useState<THREE.Mesh[]>([]);
@@ -62,7 +54,7 @@ export function House({ parentGroupRef, wireframe = false }: HouseProps) {
         // console.log("House mesh", mesh);
         let hasGlass = false;
         let hasMirror = false;
-        if (mesh.name === "Mesh011"  || mesh.name === "Mesh010_1") {
+        if (mesh.name === "Mesh087_1"  || mesh.name === "Mesh088" || mesh.name === "Mesh087" || mesh.name === "Mesh088_1") {
           const fanRoot = mesh
             fans.push(fanRoot);
         }
@@ -161,7 +153,7 @@ export function House({ parentGroupRef, wireframe = false }: HouseProps) {
               rotationZ={0}
               offsetX={0}
               offsetY={0.95}
-              offsetZ={-3.29}
+              offsetZ={-3.3}
             />
           ))}
         </>

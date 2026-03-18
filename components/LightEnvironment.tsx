@@ -122,7 +122,7 @@ export function Light_Environment({
         />
         <hemisphereLight
           position={[0, 0, 0]}
-          intensity={0.2}
+          intensity={0.4}
           color={"#FFD6A3"}
         />
         <pointLight
