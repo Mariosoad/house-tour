@@ -131,7 +131,7 @@ export function LightingControls({
       <div style={containerStyle}>
         <button
           type="button"
-          className="tour-ui-btn"
+          className="tour-ui-btn tour-ui-hide-mobile"
           onClick={() => setOpen(true)}
           aria-label="Abrir controles de iluminación"
         >
