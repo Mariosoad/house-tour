@@ -78,6 +78,10 @@ export function Light_Environment({
   debugSpotLight = true,
 }: LightEnvironmentProps) {
   const { camera } = useThree();
+  const isMobileTier = effectiveTier === "low";
+  const HDRI_LIGHT = "/Coast_Palms_HDRI_1K.hdr";
+  const HDRI_HEAVY = "/Coast_Palms_HDRI.hdr";
+  const rotationEuler: [number, number, number] = [0, Math.PI / -3, 0];
   const lightTarget = useMemo(() => {
     const t = new THREE.Object3D();
     t.position.set(0, 0, 0);
@@ -138,17 +142,31 @@ export function Light_Environment({
           intensity={isOffLighting ? 0 : 0.6}
           color={"#FFD6A3"}
         />
-      <Environment
-        files="/Coast_Palms_HDRI.hdr"
-        background
-        environmentIntensity={0}
-        backgroundRotation={[0, Math.PI / -3, 0]}
-      />
-      <Environment
-        files="/Coast_Palms_HDRI_1K.hdr"
-        environmentIntensity={0.3}
-        environmentRotation={[0, Math.PI / -3, 0]}
-      />
+
+      {isMobileTier ? (
+        // En móvil: mismo HDRI liviano para background + iluminación.
+        <Environment
+          files={HDRI_LIGHT}
+          background
+          environmentIntensity={0.3}
+          backgroundRotation={rotationEuler}
+          environmentRotation={rotationEuler}
+        />
+      ) : (
+        // Desktop: separar HDRI de background vs iluminación para no “duplicar” iluminación.
+        <>
+          {/* HDRI SOLO para background (sin contribuir a scene.environment) */}
+          <Environment files={HDRI_HEAVY} background="only" backgroundRotation={rotationEuler} />
+
+          {/* HDRI SOLO para iluminación (reflexiones/ambient) */}
+          <Environment
+            files={HDRI_LIGHT}
+            environmentIntensity={0.3}
+            environmentRotation={rotationEuler}
+            background={false}
+          />
+        </>
+      )}
     </>
   );
 }
