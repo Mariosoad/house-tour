@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/prefer-as-const */
 "use client";
 
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef, type ReactElement } from "react";
 import * as THREE from "three";
 import { EffectComposer } from "./EffectComposer";
 import { useMetrics, type EffectiveTier } from "@/lib/metricsContext";
 import { useLighting } from "@/lib/lightingContext";
 import { Light_Environment } from "./LightEnvironment";
 import { House } from "./House";
+import { useRenderSettings } from "@/lib/renderSettingsContext";
 
 import {
   ToneMappingEffect,
@@ -15,9 +16,7 @@ import {
   SMAAEffect,
   SMAAPreset,
 } from "postprocessing";
-import { SSAO as SSAOEffect } from "./effects/SSAO";
-
-const ACTIVE_POST_EFFECT: "ssao" = "ssao";
+import { N8AO } from "./effects/N8AO";
 
 import { CopyPass } from "postprocessing";
 
@@ -53,34 +52,40 @@ function SMAAEffectPrimitive({ effectiveTier }: { effectiveTier: EffectiveTier }
 }
 
 function PostEffects({ effectiveTier }: { effectiveTier: EffectiveTier }) {
-  const needsNormalPass = ACTIVE_POST_EFFECT === "ssao";
-  const ssaoSamples = effectiveTier === "low" ? 18 : 42;
-  const ssaoRings = effectiveTier === "ultra" ? 4 : 2;
-  const ssaoIntensity = effectiveTier === "ultra" ? 1.5 : 1.0;
-  const multisampling = effectiveTier === "low" ? 2 : 8;
+  const { settings } = useRenderSettings();
+  const needsNormalPass = settings.aoEnabled || settings.aoOnlyMode;
+  const multisampling = settings.aaMsaaLevel;
+  const aoActive = settings.aoEnabled || settings.aoOnlyMode;
+  const effects: ReactElement[] = [];
 
-  const activeEffect =
-    ACTIVE_POST_EFFECT === "ssao" && (
-      <SSAOEffect
-        radius={0.05}
-        intensity={ssaoIntensity}
-        rangeFalloff={0.6}
-        bias={0.04}
-        samples={ssaoSamples}
-        rings={ssaoRings}
-        luminanceInfluence={0.5}
+  if (aoActive) {
+    const aoIntensity = settings.aoOnlyMode ? Math.max(settings.aoIntensity, 1.2) : settings.aoIntensity;
+    const aoRadius = settings.aoOnlyMode ? 5 : 4;
+    effects.push(
+      <N8AO
+        key="ao"
+        aoRadius={aoRadius}
+        intensity={aoIntensity}
+        aoSamples={effectiveTier === "low" ? 8 : 16}
+        denoiseSamples={effectiveTier === "low" ? 2 : 4}
+        denoiseRadius={effectiveTier === "low" ? 8 : 12}
+        distanceFalloff={1}
+        quality={effectiveTier === "low" ? "low" : "high"}
       />
-    )
+    );
+  }
+  if (settings.aaSmaaEnabled) {
+    effects.push(<SMAAEffectPrimitive key="smaa" effectiveTier={effectiveTier} />);
+  }
+  effects.push(<ToneMappingEffectPrimitive key="tone" />);
+  effects.push(<OutputPass key="output" />);
 
   return (
     <EffectComposer
       enableNormalPass={needsNormalPass}
       multisampling={multisampling}
     >
-      {activeEffect as React.ReactElement}
-      <ToneMappingEffectPrimitive />
-      <SMAAEffectPrimitive effectiveTier={effectiveTier} />
-      <OutputPass />
+      {effects}
     </EffectComposer>
   );
 }
@@ -108,6 +113,7 @@ export function Scene({
 }: SceneProps) {
   const houseGroupRef = useRef<THREE.Group>(null);
   const { ssaoEnabled, effectiveTier } = useMetrics();
+  const { settings } = useRenderSettings();
   const { shadowScrubbing } = useLighting();
 
   useLayoutEffect(() => {
@@ -158,7 +164,9 @@ export function Scene({
         <House parentGroupRef={houseGroupRef} wireframe={wireframe} />
       </group>
 
-      {ssaoEnabled && <PostEffects effectiveTier={effectiveTier} />}
+      {(ssaoEnabled || settings.aoEnabled || settings.aoOnlyMode) && (
+        <PostEffects effectiveTier={effectiveTier} />
+      )}
     </>
   );
 }

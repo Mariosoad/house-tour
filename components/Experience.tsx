@@ -19,6 +19,9 @@ import { FullscreenButton } from "@/components/FullscreenButton";
 import { TourDebugProvider } from "@/lib/tourDebugContext";
 import { IntroOverlay } from "@/components/IntroOverlay";
 import { LoadedReporter } from "@/components/LoadedReporter";
+import { RenderLevaPanel } from "@/components/RenderLevaPanel";
+import { RenderSettingsProvider, useRenderSettings } from "@/lib/renderSettingsContext";
+import { FPSReporter } from "@/components/FPSReporter";
 
 function FallbackContent() {
   return (
@@ -41,13 +44,16 @@ function TourExperienceInner({
   hasStarted,
   onLoadingComplete,
   loadingPage,
+  uiHidden,
 }: {
   hasStarted: boolean;
   onLoadingComplete?: () => void;
   loadingPage: boolean;
+  uiHidden: boolean;
 }) {
   const { addDelta } = useTourScroll();
   const { freeCamera, effectiveTier } = useMetrics();
+  const { settings } = useRenderSettings();
   const { timeOfDay, sunRotation, manualTimeOfDay, manualSunRotation, onTimeOfDayChange, onSunRotationChange, lightingOverride, setLightingOverride } = useLighting();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -112,13 +118,16 @@ function TourExperienceInner({
           }}
           style={{ display: "block", width: "100%", height: "100%" }}
         >
-          <color attach="background" args={["#111"]} />
+          <color
+            attach="background"
+            args={[settings.aoOnlyMode ? "#ffffff" : settings.wireframe ? "#343434" : "#111"]}
+          />
           <Suspense fallback={<FallbackContent />}>
             {onLoadingComplete && <LoadedReporter onLoaded={onLoadingComplete} />}
             <Scene
               timeOfDay={effectiveTimeOfDay}
               sunRotation={effectiveSunRotation}
-              wireframe={loadingPage}
+              wireframe={loadingPage || settings.wireframe}
               webgpu={false}
               contactShadows={sceneContactShadows}
             />
@@ -126,11 +135,11 @@ function TourExperienceInner({
             <LightingSync />
             <CameraDebugUpdater />
             <CameraController />
-            {/* <FPSReporter /> */}
+            <FPSReporter enabled={settings.showMetrics} />
           </Suspense>
         </Canvas>
 
-        {hasStarted && (
+        {hasStarted && !uiHidden && (
           <>
             <div className="tour-ui__brand">
               <a href="https://www.gemdam.com" target="_blank" rel="noopener noreferrer" style={{cursor: "pointer"}}>
@@ -145,7 +154,6 @@ function TourExperienceInner({
               {freeCamera ? "Salir modo libre" : "Modo libre"}
             </button> */}
             <FullscreenButton />
-            {/* <MetricsOverlay /> */}
             <WaypointsUI />
             <TourBottomBar
               timeOfDay={effectiveTimeOfDay}
@@ -167,7 +175,23 @@ const INTRO_ZOOM_PROGRESS = 0;
 function ExperienceWithIntro() {
   const [showIntro, setShowIntro] = useState(true);
   const [loadingPage, setLoadingPage] = useState(true);
+  const [uiHidden, setUiHidden] = useState(false);
   const { setTargetProgress } = useTourScroll();
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.code !== "KeyH") return;
+      const target = event.target as HTMLElement | null;
+      const isTyping =
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.isContentEditable;
+      if (isTyping) return;
+      setUiHidden((prev) => !prev);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   const handleStartExperience = useCallback(() => {
     setShowIntro(false);
@@ -185,12 +209,22 @@ function ExperienceWithIntro() {
           hasStarted={!showIntro}
           loadingPage={loadingPage}
           onLoadingComplete={handleLoadingComplete}
+          uiHidden={uiHidden}
         />
+        <button
+          type="button"
+          className="tour-ui-btn tour-ui__toggle-ui-btn"
+          onClick={() => setUiHidden((prev) => !prev)}
+          aria-pressed={uiHidden}
+        >
+          {uiHidden ? "On UI" : "Off UI"}
+        </button>
         <IntroOverlay
           onStart={handleStartExperience}
           loadingPage={loadingPage}
-          className={showIntro ? "" : "is-hidden"}
+          className={showIntro && !uiHidden ? "" : "is-hidden"}
         />
+        {!uiHidden && <RenderLevaPanel />}
       </LightingProvider>
     </div>
   );
@@ -208,9 +242,11 @@ export function Experience() {
     <TourScrollProvider>
       <TourDebugProvider>
         <MetricsProvider>
-          <KeyboardControls map={keyboardMap}>
-            <ExperienceWithIntro />
-          </KeyboardControls>
+          <RenderSettingsProvider>
+            <KeyboardControls map={keyboardMap}>
+              <ExperienceWithIntro />
+            </KeyboardControls>
+          </RenderSettingsProvider>
         </MetricsProvider>
       </TourDebugProvider>
     </TourScrollProvider>

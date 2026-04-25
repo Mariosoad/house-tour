@@ -65,6 +65,15 @@ body {
   background: rgba(48, 48, 52, 0.95);
   border-color: rgba(255, 255, 255, 0.15);
 }
+.tour-ui__toggle-ui-btn {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2300;
+  padding: 0.45rem 0.8rem;
+  border-radius: 14px;
+  font-size: 0.75rem;
+}
 .tour-ui-hide-mobile {
   /* Default (desktop/tablet): keep visible */
   display: inline-flex;
@@ -89,7 +98,7 @@ body {
 /* Fullscreen button - solo mobile */
 .fullscreen-btn {
   position: fixed;
-  top: 1rem;
+  top: 4rem;
   right: 1rem;
   z-index: 100;
   width: 44px;
@@ -141,7 +150,7 @@ body {
 /* FPS + metrics - top right */
 .metrics-overlay {
   position: absolute;
-  top: 1rem;
+  top: 4rem;
   right: 1rem;
   z-index: 10;
 }
@@ -250,7 +259,7 @@ body {
 /* Scene objects list (Casona.gltf) */
 .scene-objects-panel {
   position: absolute;
-  top: 1rem;
+  top: 4rem;
   left: 1rem;
   z-index: 10;
   display: flex;
@@ -473,7 +482,7 @@ body {
 
 .intro-overlay__logo_tour {
   position: absolute;
-  top: 1rem;
+  top: 4rem;
   right: 1rem;
   z-index: 10;
 }
@@ -589,7 +598,7 @@ body {
 
 .tour-ui__freecamera-btn{
   position: absolute;
-  top: 1rem;
+  top: 4rem;
   left: 0;
   z-index: 10;
   padding: 0.5rem 1rem;

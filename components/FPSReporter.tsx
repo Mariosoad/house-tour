@@ -47,7 +47,7 @@ export function FPSReporter({ enabled }: { enabled?: boolean }) {
 
     const panel = document.createElement("div");
     panel.style.position = "fixed";
-    panel.style.top = "1rem";
+    panel.style.top = "3.5rem";
     panel.style.right = "1rem";
     panel.style.zIndex = "1000";
     panel.style.pointerEvents = "none";

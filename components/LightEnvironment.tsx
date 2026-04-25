@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { Environment, useHelper } from "@react-three/drei";
 import { useThree } from "@react-three/fiber";
 import type { EffectiveTier } from "@/lib/metricsContext";
+import { useRenderSettings } from "@/lib/renderSettingsContext";
 
 function sunPosition(timeOfDay: number, sunRotationDeg: number): THREE.Vector3 {
   const hour = 5 + timeOfDay * 14;
@@ -80,9 +81,10 @@ export function Light_Environment({
   effectiveTier = "ultra",
   shadowScrubbing = false,
   spotLightTarget = [0, 0.5, 0],
-  debugSpotLight = true,
+  debugSpotLight = false,
 }: LightEnvironmentProps) {
   const { camera } = useThree();
+  const { settings } = useRenderSettings();
   const isMobileTier = effectiveTier === "low";
   const HDRI_LIGHT = "/Coast_Palms_HDRI_1K.hdr";
   const HDRI_HEAVY = "/Coast_Palms_HDRI.hdr";
@@ -108,17 +110,28 @@ export function Light_Environment({
   // console.log("camera.positionX", camera.position.x);
   // console.log("camera.positionY", camera.position.y);
   // console.log("camera.positionZ", camera.position.z);
-  const isOffLighting = camera.position.x >= -0.71 && camera.position.z <= -0.1 || camera.position.z <= -0.02
+  const isOffLighting = (camera.position.x >= -0.71 && camera.position.z <= -0.1) || camera.position.z <= -0.02;
+  const pointLightsIntensityFactor = settings.pointLightsEnabled ? settings.pointLightsIntensity : 0;
+  const isWireframeMode = settings.wireframe && !settings.aoOnlyMode;
+  const directionalIntensity = settings.aoOnlyMode
+    ? 0
+    : isWireframeMode
+      ? 0.95
+      : intensity * settings.directionalLightIntensity;
+  const hemisphereIntensity = settings.aoOnlyMode ? 0 : isWireframeMode ? 0.2 : settings.hemisphereIntensity;
+  const pointLightAIntensity = settings.aoOnlyMode || isWireframeMode ? 0 : (isOffLighting ? 0 : 0.4 * pointLightsIntensityFactor);
+  const pointLightBIntensity = settings.aoOnlyMode || isWireframeMode ? 0 : (isOffLighting ? 0 : 0.6 * pointLightsIntensityFactor);
+  const environmentIntensity = settings.aoOnlyMode || isWireframeMode ? 0 : settings.environmentIntensity;
 
   return (
     <>
-      <ambientLight intensity={0.02} />
+      <ambientLight intensity={settings.aoOnlyMode ? 0.35 : isWireframeMode ? 0.06 : 0.02} />
       <primitive object={lightTarget} />
       <primitive object={spotTarget} />
       <directionalLight
         position={[pos.x, pos.y, pos.z]}
-        intensity={intensity}
-        color={color}
+        intensity={directionalIntensity}
+        color={isWireframeMode ? "#ffffff" : color}
         castShadow
         shadow-mapSize={shadowMapSize(effectiveTier, shadowScrubbing)}
         shadow-camera-near={1}
@@ -132,19 +145,19 @@ export function Light_Environment({
         />
         <hemisphereLight
           position={[0, 0, 0]}
-          intensity={0.4}
+          intensity={hemisphereIntensity}
           color={"#FFD6A3"}
         />
         <pointLight
           ref={pointRef}
           position={[0.7, 0.5, -0.08]}
-          intensity={isOffLighting ? 0 : 0.4}
+          intensity={pointLightAIntensity}
           color={"#FFD6A3"}
         />
         <pointLight
           ref={pointRef2}
           position={[-0.75, 0.7, 1.7]}
-          intensity={isOffLighting ? 0 : 0.6}
+          intensity={pointLightBIntensity}
           color={"#FFD6A3"}
         />
 
@@ -152,8 +165,8 @@ export function Light_Environment({
         // En móvil: mismo HDRI liviano para background + iluminación.
         <Environment
           files={HDRI_LIGHT}
-          background
-          environmentIntensity={0.3}
+          background={!settings.aoOnlyMode}
+          environmentIntensity={environmentIntensity}
           backgroundRotation={rotationEuler}
           environmentRotation={rotationEuler}
         />
@@ -161,12 +174,14 @@ export function Light_Environment({
         // Desktop: separar HDRI de background vs iluminación para no “duplicar” iluminación.
         <>
           {/* HDRI SOLO para background (sin contribuir a scene.environment) */}
-          <Environment files={HDRI_HEAVY} background="only" backgroundRotation={rotationEuler} />
+          {!settings.aoOnlyMode && (
+            <Environment files={HDRI_HEAVY} background="only" backgroundRotation={rotationEuler} />
+          )}
 
           {/* HDRI SOLO para iluminación (reflexiones/ambient) */}
           <Environment
             files={HDRI_LIGHT}
-            environmentIntensity={0.3}
+            environmentIntensity={environmentIntensity}
             environmentRotation={rotationEuler}
             background={false}
           />

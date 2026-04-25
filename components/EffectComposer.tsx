@@ -181,7 +181,7 @@ export const EffectComposer = /* @__PURE__ */ memo(
           if (normalPass) normalPass.enabled = false
           if (downSamplingPass) downSamplingPass.enabled = false
         }
-      }, [composer, camera, normalPass, downSamplingPass])
+      }, [composer, camera, normalPass, downSamplingPass, children])
 
       // Disable tone mapping because threejs disallows tonemapping on render targets
       useEffect(() => {
