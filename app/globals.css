@@ -62,7 +62,7 @@ body {
   transition: background 0.2s, border-color 0.2s;
 }
 .tour-ui-btn:hover {
-  background: rgba(48, 48, 52, 0.95);
+  background: rgba(48, 48, 52, 0.471);
   border-color: rgba(255, 255, 255, 0.15);
 }
 .tour-ui__toggle-ui-btn {
@@ -70,7 +70,7 @@ body {
   top: 1rem;
   right: 1rem;
   z-index: 2300;
-  padding: 0.45rem 0.8rem;
+  padding: 0.5em;
   border-radius: 14px;
   font-size: 0.75rem;
 }

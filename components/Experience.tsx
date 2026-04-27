@@ -22,6 +22,7 @@ import { LoadedReporter } from "@/components/LoadedReporter";
 import { RenderLevaPanel } from "@/components/RenderLevaPanel";
 import { RenderSettingsProvider, useRenderSettings } from "@/lib/renderSettingsContext";
 import { FPSReporter } from "@/components/FPSReporter";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function FallbackContent() {
   return (
@@ -217,7 +218,7 @@ function ExperienceWithIntro() {
           onClick={() => setUiHidden((prev) => !prev)}
           aria-pressed={uiHidden}
         >
-          {uiHidden ? "On UI" : "Off UI"}
+          {uiHidden ? <FaEye size={22} /> : <FaEyeSlash size={22} />}
         </button>
         <IntroOverlay
           onStart={handleStartExperience}
