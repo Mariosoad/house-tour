@@ -59,16 +59,31 @@ function PostEffects({ effectiveTier }: { effectiveTier: EffectiveTier }) {
   const effects: ReactElement[] = [];
 
   if (aoActive) {
-    const aoIntensity = settings.aoOnlyMode ? Math.max(settings.aoIntensity, 1.2) : settings.aoIntensity;
+    const aoIntensity = settings.aoOnlyMode ? settings.aoOnlyIntensity : settings.aoIntensity;
     const aoRadius = settings.aoOnlyMode ? 5 : 4;
+    const aoSamples = settings.aoOnlyMode
+      ? settings.aoOnlySamples
+      : effectiveTier === "low"
+        ? 8
+        : 16;
+    const denoiseSamples = settings.aoOnlyMode
+      ? settings.aoOnlyDenoiseSamples
+      : effectiveTier === "low"
+        ? 2
+        : 4;
+    const denoiseRadius = settings.aoOnlyMode
+      ? settings.aoOnlyDenoiseRadius
+      : effectiveTier === "low"
+        ? 8
+        : 12;
     effects.push(
       <N8AO
         key="ao"
         aoRadius={aoRadius}
         intensity={aoIntensity}
-        aoSamples={effectiveTier === "low" ? 8 : 16}
-        denoiseSamples={effectiveTier === "low" ? 2 : 4}
-        denoiseRadius={effectiveTier === "low" ? 8 : 12}
+        aoSamples={aoSamples}
+        denoiseSamples={denoiseSamples}
+        denoiseRadius={denoiseRadius}
         distanceFalloff={1}
         quality={effectiveTier === "low" ? "low" : "high"}
       />

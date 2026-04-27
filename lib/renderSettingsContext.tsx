@@ -9,6 +9,10 @@ export type RenderSettings = {
   qualityPreset: QualityPreset;
   wireframe: boolean;
   aoOnlyMode: boolean;
+  aoOnlyIntensity: number;
+  aoOnlyDenoiseRadius: number;
+  aoOnlySamples: number;
+  aoOnlyDenoiseSamples: number;
   aoEnabled: boolean;
   aoIntensity: number;
   aaSmaaEnabled: boolean;
@@ -49,6 +53,10 @@ const DEFAULT_SETTINGS: RenderSettings = {
   qualityPreset: "balanced",
   wireframe: false,
   aoOnlyMode: false,
+  aoOnlyIntensity: 1.25,
+  aoOnlyDenoiseRadius: 14,
+  aoOnlySamples: 24,
+  aoOnlyDenoiseSamples: 6,
   aoEnabled: true,
   aoIntensity: 0.85,
   aaSmaaEnabled: true,

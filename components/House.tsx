@@ -312,7 +312,7 @@ export function House({ parentGroupRef, wireframe = false }: HouseProps) {
       const existingOverlay = mesh.userData.wireframeOverlay as THREE.LineSegments | undefined;
       if (wireframeEnabled && !existingOverlay && mesh.geometry) {
         const overlay = new THREE.LineSegments(
-          new THREE.EdgesGeometry(mesh.geometry, 25),
+          new THREE.EdgesGeometry(mesh.geometry, 0.001),
           edgeMaterial
         );
         overlay.name = `${mesh.name || "mesh"}__wireframe_overlay`;
